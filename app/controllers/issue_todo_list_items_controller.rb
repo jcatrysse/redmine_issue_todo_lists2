@@ -49,17 +49,23 @@ class IssueTodoListItemsController < ApplicationController
   end
 
   def destroy
-    @item = IssueTodoListItem.find(params[:id])
-    @item.destroy
-    find_todo_list # Refresh last updated box
+    begin
+      @item = IssueTodoListItem.find(params[:id])
+      @item.destroy
+      find_todo_list # Refresh last updated box
 
-    respond_to do |format|
-      format.html { redirect_to :back }
-      format.js {
-        @todo_list_items = @todo_list.issue_todo_list_items
-        @issue_query = IssueQuery.new
-        render :create
-      }
+      respond_to do |format|
+        format.html { redirect_to :back }
+        format.js {
+          @todo_list_items = @todo_list.issue_todo_list_items
+          @issue_query = IssueQuery.new
+          render :create
+        }
+      end
+
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = 'The specified item could not be found.'
+      redirect_to :back
     end
   end
 

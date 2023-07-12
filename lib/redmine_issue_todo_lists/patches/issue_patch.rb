@@ -17,7 +17,7 @@ module RedmineIssueTodoLists
 
       module InstanceMethods
         def remove_todo_list_allocations
-          if self.status.is_closed and self.status != self.status_was
+          if self.status.is_closed && self.status != self.status_was
             self.issue_todo_list_items.each do |item|
               if item.issue_todo_list.remove_closed_issues
                 item.destroy
@@ -39,6 +39,16 @@ module RedmineIssueTodoLists
               position: todolist.issue_todo_list_items.find_by(issue_id: id).position
             }
           end
+        end
+
+        def issue_todo_list_titles
+          issue_todo_lists = IssueTodoList.joins(:issue_todo_list_items).where(issue_todo_list_items: { issue_id: id })
+          IssueTodoListTitles.new(issue_todo_lists)
+        end
+
+        def issue_todo_list_item_orders
+          issue_todo_list_items = IssueTodoListItem.joins(:issue_todo_list).where(issue_id: id)
+          IssueTodoListItemOrders.new(issue_todo_list_items)
         end
       end
     end

@@ -1,0 +1,24 @@
+nl:
+  issue_todo_lists_title: Takenlijsten
+  issue_todo_list_item_order: Volgorde van takenlijst
+  issue_todo_lists_title_singular: Takenlijst
+  issue_todo_lists_title_column: Titel
+  issue_todo_lists_created_by: Aangemaakt door
+  issue_todo_lists_last_updated: Laatst bijgewerkt
+  issue_todo_lists_last_updated_by: Laatst bijgewerkt door
+  issue_todo_lists_last_updated_by_only: door
+  issue_todo_lists_new: Nieuwe lijst toevoegen
+  issue_todo_lists_new_success: Takenlijst succesvol aangemaakt
+  issue_todo_lists_show: "Takenlijst #%{id}"
+  issue_todo_lists_add_issue: Taak toevoegen
+  issue_todo_lists_add_button_label: Toevoegen
+  issue_todo_lists_edit: Bewerk takenlijstinstellingen
+  issue_todo_label_edit_comment: Opmerking bewerken
+  issue_todo_label_order: Volgorde
+  issue_todo_lists_edit_success: Takenlijst succesvol bijgewerkt
+  issue_todo_lists_destroy_success: Lijst succesvol verwijderd
+  issue_todo_lists_remove_closed_issues: Gesloten taken verwijderen
+  issue_todo_lists_included_columns: Kolommen opnemen
+  issue_todo_lists_included_columns_for_issue_item: Kolom opnemen voor taakelement
+  issue_todo_lists_included_columns_for_text_item: Kolom opnemen voor tekstelement
+  issue_todo_lists_item_create_empty: Taakveld kan niet leeg zijn

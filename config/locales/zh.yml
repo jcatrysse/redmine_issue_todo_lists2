@@ -1,17 +1,24 @@
 zh:
-  issue_todo_lists_title: 待办
-  issue_todo_lists_title_singular: 待办列表
+  issue_todo_lists_title: 待办事项列表
+  issue_todo_list_item_order: 待办事项列表顺序
+  issue_todo_lists_title_singular: 待办事项列表
   issue_todo_lists_title_column: 标题
-  issue_todo_lists_created_by: 创建人
-  issue_todo_lists_last_updated: 更新日期
-  issue_todo_lists_last_updated_by: 更新人
-  issue_todo_lists_last_updated_by_only: 由
-  issue_todo_lists_new: 新建列表
-  issue_todo_lists_new_success: 待办列表已创建
-  issue_todo_lists_show: "待办列表 #%{id}"
-  issue_todo_lists_add_issue: 添加问题
-  issue_todo_lists_edit: 编辑待办列表
-  issue_todo_lists_edit_success: 待办列表已更新
-  issue_todo_lists_destroy_success: 待办列表已删除
-  issue_todo_lists_remove_closed_issues: 移除已关闭的问题
-  issue_todo_lists_item_create_empty: Both fields cannot be blank
+  issue_todo_lists_created_by: 创建者
+  issue_todo_lists_last_updated: 最后更新
+  issue_todo_lists_last_updated_by: 最后更新者
+  issue_todo_lists_last_updated_by_only: 更新者
+  issue_todo_lists_new: 添加新列表
+  issue_todo_lists_new_success: 待办事项列表创建成功
+  issue_todo_lists_show: "待办事项列表 #%{id}"
+  issue_todo_lists_add_issue: 添加任务
+  issue_todo_lists_add_button_label: 添加
+  issue_todo_lists_edit: 编辑待办事项列表设置
+  issue_todo_label_edit_comment: 编辑注释
+  issue_todo_label_order: 排序
+  issue_todo_lists_edit_success: 待办事项列表更新成功
+  issue_todo_lists_destroy_success: 列表删除成功
+  issue_todo_lists_remove_closed_issues: 删除已关闭任务
+  issue_todo_lists_included_columns: 包括列
+  issue_todo_lists_included_columns_for_issue_item: 包括任务项的列
+  issue_todo_lists_included_columns_for_text_item: 包括文本项的列
+  issue_todo_lists_item_create_empty: 任务字段不能为空

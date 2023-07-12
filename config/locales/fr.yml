@@ -1,0 +1,24 @@
+fr:
+  issue_todo_lists_title: Listes de tâches
+  issue_todo_list_item_order: Ordre de la liste de tâches
+  issue_todo_lists_title_singular: Liste de tâches
+  issue_todo_lists_title_column: Titre
+  issue_todo_lists_created_by: Créé par
+  issue_todo_lists_last_updated: Dernière mise à jour
+  issue_todo_lists_last_updated_by: Dernière mise à jour par
+  issue_todo_lists_last_updated_by_only: par
+  issue_todo_lists_new: Ajouter une nouvelle liste
+  issue_todo_lists_new_success: La liste de tâches a été créée avec succès
+  issue_todo_lists_show: "Liste de tâches #%{id}"
+  issue_todo_lists_add_issue: Ajouter une tâche
+  issue_todo_lists_add_button_label: Ajouter
+  issue_todo_lists_edit: Modifier les paramètres de la liste de tâches
+  issue_todo_label_edit_comment: Modifier le commentaire
+  issue_todo_label_order: Ordre
+  issue_todo_lists_edit_success: La liste de tâches a été mise à jour avec succès
+  issue_todo_lists_destroy_success: La liste de tâches a été supprimée avec succès
+  issue_todo_lists_remove_closed_issues: Supprimer les tâches fermées
+  issue_todo_lists_included_columns: Inclure les colonnes
+  issue_todo_lists_included_columns_for_issue_item: Inclure la colonne pour la tâche
+  issue_todo_lists_included_columns_for_text_item: Inclure la colonne pour l'élément de texte
+  issue_todo_lists_item_create_empty: Le champ de la tâche ne peut pas être vide

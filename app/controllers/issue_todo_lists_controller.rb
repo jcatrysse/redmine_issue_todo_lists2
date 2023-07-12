@@ -6,7 +6,6 @@ class IssueTodoListsController < ApplicationController
   accept_api_auth :index, :show
 
   include IssueTodoListsHelper
-
   def index
     @todo_lists = IssueTodoList.where(project_id: @project.id).order('id')
     respond_to do |format|

@@ -1,5 +1,3 @@
-require 'redmine'
-
 Redmine::Plugin.register :redmine_issue_todo_lists2 do
   name 'Issue To-do Lists Plugin (reworked)'
   author 'Jan Catrysse'
@@ -24,7 +22,11 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
 
   menu :project_menu, :issue_todo_lists, { :controller => 'issue_todo_lists', :action => 'index' }, :caption => :issue_todo_lists_title, :param => :project_id, :after => :activity
 
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/hooks'
+  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_details_bottom_hook'
+  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_context_menu_end_hook'
+  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_form_details_bottom_hook'
+  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller_issues_new_after_save_hook'
+  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller_issues_edit_after_save_hook'
   require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_patch'
   require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/project_patch'
   require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_query_patch'

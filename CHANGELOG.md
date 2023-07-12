@@ -1,4 +1,11 @@
 # CHANGELOG
+### 2.1.0
+
+* NL and FR translations
+* Update DE, ES and ZH translations (not verified)
+* Add to-do list selection on issue `edit` or `creation`
+* Corrections on some structural issues
+
 ### 2.0.0
 
 * mainly a move to a new maintained repository (thank you Den / Canidas for your work)

@@ -96,18 +96,6 @@ module RedmineIssueTodoLists
       end
     end
   end
-
-  class Issue < ActiveRecord::Base
-    def issue_todo_list_titles
-      issue_todo_lists = IssueTodoList.joins(:issue_todo_list_items).where(issue_todo_list_items: { issue_id: id })
-      IssueTodoListTitles.new(issue_todo_lists)
-    end
-
-    def issue_todo_list_item_orders
-      issue_todo_list_items = IssueTodoListItem.joins(:issue_todo_list).where(issue_id: id )
-      IssueTodoListItemOrders.new(issue_todo_list_items)
-    end
-  end
 end
 
 IssueQuery.prepend(RedmineIssueTodoLists::Patches::IssueQueryPatch::InstanceMethods)
