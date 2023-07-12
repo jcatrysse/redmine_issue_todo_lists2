@@ -1,0 +1,17 @@
+module RedmineIssueTodoLists
+  module Hooks
+    class Hooks < Redmine::Hook::ViewListener
+      def view_issues_context_menu_end(context={})
+        # Collect all to-do lists of all projects
+        context[:todo_lists] = IssueTodoListsHelper.get_all_todo_lists_from_project_issues(context[:issues])
+
+        context[:controller].send(:render_to_string, {
+          :partial => 'issue_todo_lists/issues_context_menu',
+          :locals => context
+        })
+      end
+
+      render_on :view_issues_show_details_bottom, partial: 'issue_todo_lists/issue_todo_lists_link'
+    end
+  end
+end

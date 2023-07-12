@@ -1,0 +1,34 @@
+#issue-todo-list-table.sortable td {
+    cursor: move;
+}
+
+/* Full line comment */
+#issue-todo-list-table td[colspan] {
+    text-align: left;
+    padding-left: 10px;
+}
+
+#show-right-box p {
+    margin: 0;
+}
+
+.issue-todo-list-drop {
+    height: 23px;
+    width: 100%;
+    border: 1px solid #000;
+}
+
+.controller-issue_todo_lists .new_item input[type=submit] {
+    /* display: none; */
+}
+
+/* Same style as autocomplete */
+.controller-issue_todo_lists .new_item #item_comment {
+    border: 1px solid #9EB1C2;
+    border-radius: 2px;
+    height: 1.5em;
+}
+
+.ui-tooltip{
+    width: min-content !Important;
+}
