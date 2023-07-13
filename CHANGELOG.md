@@ -1,10 +1,14 @@
 # CHANGELOG
+### 2.1.1
+
+* correction not removing items from todolist when closed
+
 ### 2.1.0
 
 * NL and FR translations
-* Update DE, ES and ZH translations (not verified)
-* Add to-do list selection on issue `edit` or `creation`
-* Corrections on some structural issues
+* update DE, ES and ZH translations (not verified)
+* add to-do list selection on issue `edit` or `creation`
+* corrections on some structural issues
 
 ### 2.0.0
 
