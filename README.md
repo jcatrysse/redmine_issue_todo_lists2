@@ -10,8 +10,8 @@ Thank you for your great work.
 
 ## Compatibility
 
-* Version 2.0 >= Redmine 4 (including Remdine 5)
-* Version 1.4 >= Redmine 4 (including Remdine 5)
+* Version 2.0 >= Redmine 4 (including Redmine 5)
+* Version 1.4 >= Redmine 4 (including Redmine 5)
 * Version 1.3 for = Redmine 4 ONLY
 * Version 1.2 for <= Redmine 3.4 
  
