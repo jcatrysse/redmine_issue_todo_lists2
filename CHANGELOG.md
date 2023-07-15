@@ -1,4 +1,8 @@
 # CHANGELOG
+### 2.1.2
+
+* resolve error when liquid is missing
+
 ### 2.1.1
 
 * correction not removing items from todolist when closed
