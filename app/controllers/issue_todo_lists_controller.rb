@@ -59,7 +59,7 @@ class IssueTodoListsController < ApplicationController
 
   def update
     respond_to do |format|
-      if @todo_list.update_attributes(issue_todo_list_params)
+      if @todo_list.update(issue_todo_list_params)
         format.html { redirect_to project_issue_todo_list_path(@project, @todo_list), notice: l(:issue_todo_lists_edit_success) }
       else
         format.html { render 'form' }

@@ -1,4 +1,8 @@
 # CHANGELOG
+### 2.1.3
+
+* correction of a deprecated Rails method in Redmine 5
+
 ### 2.1.2
 
 * resolve error when liquid is missing
