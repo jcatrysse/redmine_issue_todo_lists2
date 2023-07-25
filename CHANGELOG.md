@@ -3,6 +3,7 @@
 
 * further corrections on Zeitwork not ignoring Liquid when missing
 * refactor migration scripts, to be fully compatible (using Active Record)
+* correct references to the former plugin's assets
 
 ### 2.1.3
 
