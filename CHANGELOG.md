@@ -2,7 +2,6 @@
 ### 2.1.5
 
 * upgrade database and models to use a more Rails compliant approach, using references
-*  including migration script
 *  complete rework of db migration scripts, to avoid errors on migration
 
 ### 2.1.4
