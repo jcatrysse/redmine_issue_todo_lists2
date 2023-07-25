@@ -1,4 +1,9 @@
 # CHANGELOG
+### 2.1.4
+
+* further corrections on Zeitwork not ignoring Liquid when missing
+* refactor migration scripts, to be fully compatible (using Active Record)
+
 ### 2.1.3
 
 * correction of a deprecated Rails method in Redmine 5
