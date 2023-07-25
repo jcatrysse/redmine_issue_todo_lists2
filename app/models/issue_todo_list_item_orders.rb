@@ -14,6 +14,7 @@ class IssueTodoListItemOrders
   end
 
   def visible?(user = User.current)
-    user.allowed_to?(:view_issue_todo_lists, @project, global: true)
+    project = issue_todo_list_item.first&.issue_todo_list&.project
+    project && user.allowed_to?(:view_issue_todo_lists, project, global: true)
   end
 end
