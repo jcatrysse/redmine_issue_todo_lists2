@@ -7,10 +7,6 @@ class AddReferences < ActiveRecord::Migration[4.2]
 
     unless column_exists?(:issue_todo_lists, :last_updated_by_id)
       rename_column :issue_todo_lists, :last_updated_by, :last_updated_by_id
-      IssueTodoList.reset_column_information
-      IssueTodoList.where(last_updated_by_id: nil).each do |list|
-        list.update!(last_updated_by_id: User.first.id) # Or any default user you want
-      end
     end
 
     # Modifying issue_todo_list_items
