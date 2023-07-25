@@ -1,4 +1,9 @@
 # CHANGELOG
+### 2.1.5
+
+* upgrade database and models to use a more Rails compliant approach, using references
+*  including migration scripts
+
 ### 2.1.4
 
 * further corrections on Zeitwork not ignoring Liquid when missing
