@@ -1,8 +1,9 @@
 # CHANGELOG
 ### 2.1.5
 
-* upgrade database and models to use a more Rails compliant approach, using references
-*  complete rework of db migration scripts, to avoid errors on migration
+*  complete rework of db migration scripts, to avoid errors on migrations, better SQL compliancy and optimizations on large datasets
+*  add foreign key constraints and some fields have been renamed for cosmetic reasons
+*  corrections in the `visible?` method
 
 ### 2.1.4
 
