@@ -15,7 +15,9 @@ class IssueTodoListItem < ActiveRecord::Base
     todo_list.force_updated
     todo_list.save
   end
+
   def visible?(user = User.current)
-    user.allowed_to?(:view_issue_todo_lists, @project, global: true)
+    project = issue_todo_list&.project
+    project && user.allowed_to?(:view_issue_todo_lists, project, global: true)
   end
 end
