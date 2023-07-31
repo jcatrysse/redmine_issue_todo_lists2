@@ -11,13 +11,13 @@ class AddReferences < ActiveRecord::Migration[4.2]
 
     # Modifying issue_todo_list_items
     begin
-      add_reference :issue_todo_list_items, :issue_todo_list, foreign_key: true, index: true
+      add_foreign_key :issue_todo_list_items, :issue_todo_lists
     rescue StandardError => e
       warn "Could not add foreign key constraint to issue_todo_list_items for issue_todo_list: #{e.message}"
     end
 
     begin
-      add_reference :issue_todo_list_items, :issue, foreign_key: true, index: true
+      add_foreign_key :issue_todo_list_items, :issue
     rescue StandardError => e
       warn "Could not add foreign key constraint to issue_todo_list_items for issue: #{e.message}"
     end
