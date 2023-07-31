@@ -21,6 +21,19 @@ class AddReferences < ActiveRecord::Migration[4.2]
     rescue StandardError => e
       warn "Could not add foreign key constraint to issue_todo_list_items for issue: #{e.message}"
     end
+
+    # Modifying issue_todo_lists
+    begin
+      add_foreign_key :issue_todo_lists, :users, column: :created_by_id
+    rescue StandardError => e
+      warn "Could not add foreign key constraint to issue_todo_list_items for issue_todo_list: #{e.message}"
+    end
+
+    begin
+      add_foreign_key :issue_todo_lists, :users, column: :last_updated_by_id
+    rescue StandardError => e
+      warn "Could not add foreign key constraint to issue_todo_list_items for issue: #{e.message}"
+    end
   end
 
   def down
@@ -50,7 +63,6 @@ class AddReferences < ActiveRecord::Migration[4.2]
       rescue StandardError => e
         warn "Could not remove foreign key constraint from issue_todo_list_items for issue_todo_list_id: #{e.message}"
       end
-      remove_reference :issue_todo_list_items, :issue_todo_list, index: true
     end
 
     if column_exists?(:issue_todo_list_items, :issue_id)
@@ -59,7 +71,6 @@ class AddReferences < ActiveRecord::Migration[4.2]
       rescue StandardError => e
         warn "Could not remove foreign key constraint from issue_todo_list_items for issue_id: #{e.message}"
       end
-      remove_reference :issue_todo_list_items, :issue, index: true
     end
   end
 end
