@@ -1,7 +1,7 @@
 class IssueTodoList < ActiveRecord::Base
   belongs_to :project
-  belongs_to :created_by, :class_name => 'User', :foreign_key => 'created_by'
-  belongs_to :last_updated_by, :class_name => 'User', :foreign_key => 'last_updated_by'
+  belongs_to :created_by, class_name: 'User', foreign_key: 'created_by_id'
+  belongs_to :last_updated_by, class_name: 'User', foreign_key: 'last_updated_by_id'
 
   has_many :issue_todo_list_items, -> { order('position ASC') }, dependent: :destroy
   has_many :issues, through: :issue_todo_list_items
@@ -24,6 +24,6 @@ class IssueTodoList < ActiveRecord::Base
   end
 
   def visible?(user = User.current)
-    user.allowed_to?(:view_issue_todo_lists, @project, global: true)
+    user.allowed_to?(:view_issue_todo_lists, project, global: true)
   end
 end

@@ -1,4 +1,10 @@
 # CHANGELOG
+### 2.1.5
+
+*  complete rework of db migration scripts, to avoid errors on migrations, better SQL compliancy and optimizations on large datasets
+*  add foreign key constraints and some fields have been renamed for cosmetic reasons
+*  corrections in the `visible?` method
+
 ### 2.1.4
 
 * further corrections on Zeitwork not ignoring Liquid when missing
