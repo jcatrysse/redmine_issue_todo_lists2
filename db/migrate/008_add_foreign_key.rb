@@ -1,4 +1,4 @@
-class AddReferences < ActiveRecord::Migration[4.2]
+class AddForeignKey < ActiveRecord::Migration[4.2]
   def up
     # Modifying issue_todo_lists
     unless column_exists?(:issue_todo_lists, :created_by_id)
