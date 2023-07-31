@@ -11,28 +11,28 @@ class AddReferences < ActiveRecord::Migration[4.2]
 
     # Modifying issue_todo_list_items
     begin
-      add_foreign_key :issue_todo_list_items, :issue_todo_lists
+      add_foreign_key :issue_todo_list_items, :issue_todo_lists, column: :issue_todo_list_id
     rescue StandardError => e
-      warn "Could not add foreign key constraint to issue_todo_list_items for issue_todo_list: #{e.message}"
+      warn "Could not add foreign key constraint to issue_todo_list_items for issue_todo_list_id: #{e.message}"
     end
 
     begin
-      add_foreign_key :issue_todo_list_items, :issue
+      add_foreign_key :issue_todo_list_items, :issues, column: :issue_id
     rescue StandardError => e
-      warn "Could not add foreign key constraint to issue_todo_list_items for issue: #{e.message}"
+      warn "Could not add foreign key constraint to issue_todo_list_items for issues: #{e.message}"
     end
 
     # Modifying issue_todo_lists
     begin
       add_foreign_key :issue_todo_lists, :users, column: :created_by_id
     rescue StandardError => e
-      warn "Could not add foreign key constraint to issue_todo_list_items for issue_todo_list: #{e.message}"
+      warn "Could not add foreign key constraint to issue_todo_list_items for issue_id: #{e.message}"
     end
 
     begin
       add_foreign_key :issue_todo_lists, :users, column: :last_updated_by_id
     rescue StandardError => e
-      warn "Could not add foreign key constraint to issue_todo_list_items for issue: #{e.message}"
+      warn "Could not add foreign key constraint to issue_todo_list_items for last_updated_by_id: #{e.message}"
     end
   end
 
