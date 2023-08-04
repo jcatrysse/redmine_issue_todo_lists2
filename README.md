@@ -28,8 +28,6 @@ Currently there's no difference between 1.2 and 1.3 except Redmine 4 compatibili
 * Add issue to to-do list on creation
 * Issue Filters and Columns
 
-That's a clear and concise way to describe the current issue. Here's a bit more detail, if you'd like:
-
 ## Remarks
 * The sorting functionality of the new "Issues Columns" currently operates only on the first element. This means that, when the column is sorted, only the first item in each row is considered for the sorting operation.
 * Additionally, the sorting operation does not account for visibility permissions. This means that items may be sorted based on data that is not currently visible to the user.
