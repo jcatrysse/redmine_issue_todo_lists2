@@ -1,6 +1,6 @@
 <% todo_lists = IssueTodoList.where(project_id: issue.project.self_and_ancestors.ids).order('project_id', 'title') %>
 <% allowed_todo_lists = todo_lists.select do |list|
-  User.current.allowed_to?(:add_issue_todo_list_items, list.project) ||
+  User.current.admin? || User.current.allowed_to?(:add_issue_todo_list_items, list.project) ||
     (!issue.new_record? && User.current.allowed_to?(:remove_issue_todo_list_items, list.project) && list.issue_todo_list_items.exists?(issue_id: issue.id))
 end %>
 <% if allowed_todo_lists.count.positive? %>

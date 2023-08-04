@@ -5,7 +5,9 @@ module RedmineIssueTodoLists
       module InstanceMethods
         def initialize_available_filters
           super
-          if User.current.admin? || User.current.allowed_to?(:view_issue_todo_lists, project, global: true)
+          project_ids = project ? project.self_and_ancestors.ids + project.self_and_descendants.ids : User.current.projects.visible.pluck(:id)
+
+          if User.current.admin? || project_ids.any? { |id| User.current.allowed_to?(:view_issue_todo_lists, Project.find(id)) }
             add_available_filter("todo_lists_ids", :type => :list_optional, values: issue_todo_lists_values, :label => :issue_todo_lists_title)
           end
         end
@@ -14,7 +16,9 @@ module RedmineIssueTodoLists
           return @available_columns if @available_columns
 
           @available_columns = super
-          if User.current.allowed_to?(:view_issue_todo_lists, project, global: true)
+          project_ids = project ? project.self_and_ancestors.ids + project.self_and_descendants.ids : User.current.projects.visible.pluck(:id)
+
+          if User.current.admin? || project_ids.any? { |id| User.current.allowed_to?(:view_issue_todo_lists, Project.find(id)) }
             @available_columns << QueryAssociationColumn.new(
               :issue_todo_list_titles,
               :titles,
@@ -34,14 +38,17 @@ module RedmineIssueTodoLists
         end
 
         def issue_todo_lists_values
-          return [] unless User.current.allowed_to?(:view_issue_todo_lists, project, global: true)
           project_ids = project ? project.self_and_ancestors.ids + project.self_and_descendants : User.current.projects.visible.pluck(:id)
-          todo_lists = IssueTodoList.where(project_id: project_ids).order('project_id', 'title').map do |list|
+          todo_lists = IssueTodoList.where(project_id: project_ids).order('project_id', 'title')
+
+          unless User.current.admin?
+            todo_lists = todo_lists.select { |list| User.current.allowed_to?(:view_issue_todo_lists, list.project) }
+          end
+
+          todo_lists.map do |list|
             project_name = list.project.present? ? "#{list.project.name}: " : ''
             [project_name + list.title.to_s, list.id.to_s]
           end
-
-          todo_lists
         end
 
         def sql_for_todo_lists_ids_field(field, operator, value)

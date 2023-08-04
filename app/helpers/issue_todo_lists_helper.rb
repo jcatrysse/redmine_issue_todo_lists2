@@ -17,6 +17,7 @@ module IssueTodoListsHelper
   end
 
   def self.has_todo_lists_permission?(projects)
+    return true if User.current.admin?
     projects.each do |project|
       return true if User.current.allowed_to?(:view_issue_todo_lists, project)
     end
@@ -42,7 +43,7 @@ module IssueTodoListsHelper
       end
     end
 
-    todo_lists.keep_if { |todo_list| User.current.allowed_to?(:add_issue_todo_list_items_context_menu, todo_list.project) }
+    todo_lists.keep_if { |todo_list| User.current.admin? || User.current.allowed_to?(:add_issue_todo_list_items_context_menu, todo_list.project) }
     todo_lists.to_a.sort! { |a,b| a.title <=> b.title }
   end
 

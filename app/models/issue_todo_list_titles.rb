@@ -5,16 +5,13 @@ class IssueTodoListTitles
     @issue_todo_lists = issue_todo_lists
   end
 
-  def titles
-    issue_todo_lists.pluck(:title).join(', ')
+  def titles(user = User.current)
+    visible_issue_todo_lists(user)
   end
 
-  def sortable_value
-    issue_todo_lists.first.id
-  end
-
-  def visible?(user = User.current)
-    project = issue_todo_lists.first&.project
-    project && user.allowed_to?(:view_issue_todo_lists, project, global: true)
+  private
+  def visible_issue_todo_lists(user)
+    return issue_todo_lists if user.admin?
+    issue_todo_lists.select { |list| list.visible?(user) }
   end
 end

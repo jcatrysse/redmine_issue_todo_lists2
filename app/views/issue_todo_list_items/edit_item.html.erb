@@ -1,4 +1,4 @@
-<% if User.current.allowed_to?(:update_issue_todo_list_items, @project) %>
+<% if User.current.admin? || User.current.allowed_to?(:update_issue_todo_list_items, @project) %>
   <div id="edit_item_comment_box" class="box tabular">
     <%= labelled_form_for [@project, @item], :as => :item, :remote => true, :url => project_issue_todo_list_item_path(@project, @todo_list, @item), :method => :put  do |f| %>
       <p><%= f.text_area :comment, {rows: 8, id: 'edit_item_comment', class: 'wiki-edit'} %></p>

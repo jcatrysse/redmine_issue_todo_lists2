@@ -5,16 +5,13 @@ class IssueTodoListItemOrders
     @issue_todo_list_item = issue_todo_list_item
   end
 
-  def positions
-    issue_todo_list_item.pluck(:position).join(', ')
+  def positions(user = User.current)
+    visible_issue_todo_list_item(user).pluck(:position).join(', ')
   end
 
-  def sortable_value
-    issue_todo_list_item.first.issue_todo_list.id
-  end
-
-  def visible?(user = User.current)
-    project = issue_todo_list_item.first&.issue_todo_list&.project
-    project && user.allowed_to?(:view_issue_todo_lists, project, global: true)
+  private
+  def visible_issue_todo_list_item(user)
+    return issue_todo_list_item if user.admin?
+    issue_todo_list_item.select { |item| item.issue_todo_list.visible?(user) }
   end
 end

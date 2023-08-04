@@ -17,7 +17,6 @@ class IssueTodoListItem < ActiveRecord::Base
   end
 
   def visible?(user = User.current)
-    project = issue_todo_list&.project
-    project && user.allowed_to?(:view_issue_todo_lists, project, global: true)
+    issue.visible?(user)
   end
 end
