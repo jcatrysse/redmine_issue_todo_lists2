@@ -24,7 +24,7 @@ Currently there's no difference between 1.2 and 1.3 except Redmine 4 compatibili
 * Autocomplete for issues (as with issue relations)
 * To-do lists show all configured default columns displayed on the normal issue list
 * Remove closed issues from to-do list automatically (configurable per to-do list)
-* Modify to-do list adherance from issue details and on edit
+* Modify to-do list adherence from issue details and on edit
 * Add issue to to-do list on creation
 * Issue Filters and Columns
 
