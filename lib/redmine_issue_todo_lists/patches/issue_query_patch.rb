@@ -3,8 +3,8 @@ module RedmineIssueTodoLists
   module Patches
     module IssueQueryPatch
       module InstanceMethods
-        def initialize_available_filters
-          super
+        def initialize_available_filters_with_itdl
+          initialize_available_filters_without_itdl
           project_ids = project ? project.self_and_ancestors.ids + project.self_and_descendants.ids : User.current.projects.visible.pluck(:id)
 
           if User.current.admin? || project_ids.any? { |id| User.current.allowed_to?(:view_issue_todo_lists, Project.find(id)) }
@@ -12,10 +12,10 @@ module RedmineIssueTodoLists
           end
         end
 
-        def available_columns
+        def available_columns_with_itdl
           return @available_columns if @available_columns
 
-          @available_columns = super
+          @available_columns = available_columns_without_itdl
           project_ids = project ? project.self_and_ancestors.ids + project.self_and_descendants.ids : User.current.projects.visible.pluck(:id)
 
           if User.current.admin? || project_ids.any? { |id| User.current.allowed_to?(:view_issue_todo_lists, Project.find(id)) }
@@ -105,4 +105,10 @@ module RedmineIssueTodoLists
   end
 end
 
-IssueQuery.prepend(RedmineIssueTodoLists::Patches::IssueQueryPatch::InstanceMethods)
+IssueQuery.include(RedmineIssueTodoLists::Patches::IssueQueryPatch::InstanceMethods)
+IssueQuery.class_eval do
+  alias_method :initialize_available_filters_without_itdl, :initialize_available_filters
+  alias_method :initialize_available_filters, :initialize_available_filters_with_itdl
+  alias_method :available_columns_without_itdl, :available_columns
+  alias_method :available_columns, :available_columns_with_itdl
+end

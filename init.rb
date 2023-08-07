@@ -2,7 +2,7 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
   name 'Issue To-do Lists Plugin (reworked)'
   author 'Jan Catrysse'
   description 'Organize issues in to-do lists by manually ordering their priority'
-  version '2.1.6'
+  version '2.1.7'
   url 'https://github.com/jcatrysse/redmine_issue_todo_lists2'
   author_url 'https://github.com/jcatrysse'
 
@@ -21,27 +21,26 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
   end
 
   menu :project_menu, :issue_todo_lists, { :controller => 'issue_todo_lists', :action => 'index' }, :caption => :issue_todo_lists_title, :param => :project_id, :after => :activity
+end
 
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_details_bottom_hook'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_context_menu_end_hook'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_form_details_bottom_hook'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller_issues_new_after_save_hook'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller_issues_edit_after_save_hook'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_patch'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/project_patch'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_query_patch'
-  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/query_helper_patch'
- 
-  if defined?(::Liquid::Drop)
-    require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop'
-    require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_drop_patch.rb'
-  else
-    liquid_files = [File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop.rb',
-                    File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_drop_patch.rb']
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_details_bottom_hook'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_context_menu_end_hook'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_form_details_bottom_hook'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller_issues_new_after_save_hook'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller_issues_edit_after_save_hook'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_patch'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/project_patch'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_query_patch'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/query_helper_patch'
 
-    Rails.autoloaders.each do |autoloader|
-      autoloader.ignore(liquid_files)
-    end
+if defined?(::Liquid::Drop)
+  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop'
+  require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_drop_patch.rb'
+else
+  liquid_files = [File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop.rb',
+                  File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_drop_patch.rb']
+
+  Rails.autoloaders.each do |autoloader|
+    autoloader.ignore(liquid_files)
   end
-  
 end
