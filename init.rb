@@ -31,7 +31,7 @@ require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_patch'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/project_patch'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_query_patch'
-require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/query_helper_patch'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/queries_helper_patch'
 
 if defined?(::Liquid::Drop)
   require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop'

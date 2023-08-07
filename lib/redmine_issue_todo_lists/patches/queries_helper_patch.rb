@@ -2,7 +2,7 @@ require_dependency 'queries_helper'
 
 module RedmineIssueTodoLists
   module Patches
-    module QueryHelperPatch
+    module QueriesHelperPatch
       def column_content(column, issue)
         if column.name == :"issue_todo_list_titles.titles"
           issue.issue_todo_list_titles.titles(User.current).map do |todo_list|
@@ -16,4 +16,4 @@ module RedmineIssueTodoLists
   end
 end
 
-QueriesHelper.prepend(RedmineIssueTodoLists::Patches::QueryHelperPatch)
+QueriesHelper.prepend(RedmineIssueTodoLists::Patches::QueriesyHelperPatch)
