@@ -85,8 +85,8 @@ module RedmineIssueTodoLists
           end
         end
 
-        def joins_for_order_statement(order_options)
-          joins = [super]
+        def joins_for_order_statement_with_itdl(order_options)
+          joins = [joins_for_order_statement_without_itdl(order_options)]
           new_joins = []
           if order_options.include?("#{IssueTodoListItem.table_name}.position")
             new_joins << "LEFT OUTER JOIN #{IssueTodoListItem.table_name} ON #{IssueTodoListItem.table_name}.issue_id = #{Issue.table_name}.id"
@@ -111,4 +111,6 @@ IssueQuery.class_eval do
   alias_method :initialize_available_filters, :initialize_available_filters_with_itdl
   alias_method :available_columns_without_itdl, :available_columns
   alias_method :available_columns, :available_columns_with_itdl
+  alias_method :joins_for_order_statement_without_itdl, :joins_for_order_statement
+  alias_method :joins_for_order_statement, :joins_for_order_statement_with_itdl
 end

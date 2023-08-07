@@ -1,7 +1,7 @@
 # CHANGELOG
 ### 2.1.7
 * Resolved issue: `SystemStackError (stack level too deep)`  
-  Converted `initialize_available_filters` to use `alias_method`
+  Converted methods to use `alias_method`
 
 ### 2.1.6
 * Correction for `admin` privileges: *admin should always have full access*
