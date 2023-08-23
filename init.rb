@@ -2,7 +2,7 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
   name 'Issue To-do Lists Plugin (reworked)'
   author 'Jan Catrysse'
   description 'Organize issues in to-do lists by manually ordering their priority'
-  version '2.1.7'
+  version '2.1.8'
   url 'https://github.com/jcatrysse/redmine_issue_todo_lists2'
   author_url 'https://github.com/jcatrysse'
 
@@ -37,10 +37,12 @@ if defined?(::Liquid::Drop)
   require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop'
   require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_drop_patch.rb'
 else
-  liquid_files = [File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop.rb',
-                  File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_drop_patch.rb']
+  if defined?(Rails.autoloaders)
+    liquid_files = [File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/liquid/todo_lists_drop.rb',
+                    File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_drop_patch.rb']
 
-  Rails.autoloaders.each do |autoloader|
-    autoloader.ignore(liquid_files)
+    Rails.autoloaders.each do |autoloader|
+      autoloader.ignore(liquid_files)
+    end
   end
 end

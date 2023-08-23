@@ -1,4 +1,7 @@
 # CHANGELOG
+### 2.1.8
+* Resolve issue in Redmine 4 not supporting Rails.autoloaders
+
 ### 2.1.7
 * Resolved issue: `SystemStackError (stack level too deep)`  
   Converted methods to use `alias_method`
