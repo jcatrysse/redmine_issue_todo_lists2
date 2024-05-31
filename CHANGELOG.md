@@ -1,4 +1,7 @@
 # CHANGELOG
+### 2.1.9
+* Resolve issue: `Mysql2::Error: Column 'position' in order clause is ambiguous`
+
 ### 2.1.8
 * Resolve issue in Redmine 4 not supporting Rails.autoloaders
 
