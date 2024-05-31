@@ -3,7 +3,7 @@ class IssueTodoList < ActiveRecord::Base
   belongs_to :created_by, class_name: 'User', foreign_key: 'created_by_id'
   belongs_to :last_updated_by, class_name: 'User', foreign_key: 'last_updated_by_id'
 
-  has_many :issue_todo_list_items, -> { order('position ASC') }, dependent: :destroy
+  has_many :issue_todo_list_items, -> { order('issue_todo_list_items.position ASC') }, dependent: :destroy
   has_many :issues, through: :issue_todo_list_items
 
   validates :title, presence: true
