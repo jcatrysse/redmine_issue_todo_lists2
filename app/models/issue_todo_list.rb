@@ -9,8 +9,8 @@ class IssueTodoList < ActiveRecord::Base
   validates :title, presence: true
   before_save :force_updated
 
-  serialize :included_columns, Array
-  serialize :included_fields, Array
+  serialize :included_columns, coder: YAML, type: Array
+  serialize :included_fields, coder: YAML, type: Array
 
   def get_max_position
     max = IssueTodoListItem.where(issue_todo_list_id: self.id).maximum(:position)
