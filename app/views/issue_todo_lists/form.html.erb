@@ -32,16 +32,18 @@
                     <%= column.caption %>
                   </td>
                   <td>
+                    <%# Added Condition to check if @todo_list.included_columns exists%>
                     <%
                       checked =
-                          @todo_list.included_columns.count > 0 ?
+                          !@todo_list.included_columns.nil? && @todo_list.included_columns.count  > 0 ?
                               @todo_list.included_columns.include?(column.name.to_s) :
                               @issue_query.columns.include?(column) %>
                     <%= f.check_box :included_columns, {multiple: true, label: '', checked: checked}, column.name, false %>
                   </td>
                   <td>
+                    <%# Added Condition to check if @todo_list.included_fields exists%>
                     <%
-                      checked = @todo_list.included_fields.include?(column.name.to_s) %>
+                      checked = @todo_list.included_fields.include?(column.name.to_s) if !@todo_list.included_fields.nil?  %>
                     <%= f.check_box :included_fields, {multiple: true, label: '', checked: checked}, column.name, false %>
                   </td>
                 </tr>

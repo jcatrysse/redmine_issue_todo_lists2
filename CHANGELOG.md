@@ -79,3 +79,5 @@ Changes by: Jan Catrysse
 * added textile support for comments
 * added "Order" column to table
 * new permission "update items"
+### 1.3.2
+* added possibility to add todo item without a relatin issue
