@@ -4,7 +4,8 @@
       <p><%= f.text_area :comment, {rows: 8, id: 'edit_item_comment', class: 'wiki-edit'} %></p>
         <% @todo_list.included_fields.each do |fieldName| %>
           <% column = @issue_query.available_columns.find {|aColumn| aColumn.name.to_s === fieldName.to_s} %>
-          <% value = @item.data.find {|itemData| itemData[:field].to_s === fieldName.to_s} %>
+          <%# Added Condition to check if @item.data exists before treatment %>
+          <% value = @item.data.find {|itemData| itemData[:field].to_s === fieldName.to_s} if @item.data %>
           <% value = value ? value[:value] : nil %>
           <% if column %>
             <p>

@@ -1,4 +1,7 @@
 # CHANGELOG
+### 2.2.0
+* Restore the previous functionality to add text only todo items
+  
 ### 2.1.9
 * Resolve issue: `Mysql2::Error: Column 'position' in order clause is ambiguous`
 
@@ -79,3 +82,4 @@ Changes by: Jan Catrysse
 * added textile support for comments
 * added "Order" column to table
 * new permission "update items"
+

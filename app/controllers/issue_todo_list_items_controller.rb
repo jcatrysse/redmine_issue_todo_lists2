@@ -13,14 +13,16 @@ class IssueTodoListItemsController < ApplicationController
     if match and match[1]
       @item.issue = Issue.visible.find_by_id(match[1].to_i)
     end
+    # Anass: Disabled to allow saving TodoListItems without any Issue Related to it 
+    # if not params[:item][:issue_id].empty? and @item.issue.nil?
+    #     @item.errors.add(:base, l(:error_issue_not_found_in_project))
+    # elsif @item.issue.nil?
+    #   @item.errors.add(:base, l(:issue_todo_lists_item_create_empty))
+    # else
+    #   @item.save
+    # end
 
-    if not params[:item][:issue_id].empty? and @item.issue.nil?
-        @item.errors.add(:base, l(:error_issue_not_found_in_project))
-    elsif @item.issue.nil?
-      @item.errors.add(:base, l(:issue_todo_lists_item_create_empty))
-    else
-      @item.save
-    end
+    @item.save
 
     respond_to do |format|
       format.js {

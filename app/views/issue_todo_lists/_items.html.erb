@@ -5,9 +5,16 @@
 <% end %>
 <% @todo_list_items.each_with_index do |item, itemIdx| %>
   <tr id="issue-todo-list-item-<%= item.id %>" class="hascontextmenu <%= cycle 'odd', 'even' %>">
-    <td class="checkbox">
-      <%= check_box_tag("ids[]", item.issue.id, false, :id => nil)  %>
-    </td>
+  <%# Added Condition to check if item.issue exists before addind checkbox %>
+    <% if item.issue.nil? %>
+      <td class="checkbox">
+        <%= check_box_tag("ids[]", nil, false, :id => nil)  %>
+      </td>
+    <% else %>
+      <td class="checkbox">
+        <%= check_box_tag("ids[]", item.issue.id, false, :id => nil)  %>
+      </td>
+    <% end %>
     <td class="issue-todo-list-item-order">
       <%= item.position %>
     </td>
@@ -28,7 +35,8 @@
       </td>
       <% @todo_list.included_fields.each do |fieldName| %>
         <% column = @issue_query.available_columns.find {|aColumn| aColumn.name.to_s === fieldName.to_s} %>
-        <% value = item.data.find {|itemData| itemData[:field].to_s === fieldName.to_s} %>
+        
+        <% value = item.data.find {|itemData| itemData[:field].to_s === fieldName.to_s} if item.data %>
         <% value = value ? value[:value] : nil %>
         <td>
           <% if column && value.present? %>
