@@ -1,7 +1,12 @@
 # CHANGELOG
+### 2.2.1
+* Add YAML coder to serializer, for Rails 7 / Redmine 6 compatibility (thank you bytemine Team)
+* Add a configurable `Date` context menu to change start and end dates on issues
+* Correct a stylesheet issue (autoscroll - overflow-x: auto;)
+
 ### 2.2.0
-* Restore the previous functionality to add text only todo items
-  
+* Restore the previous functionality to add text only todo items (thank you Anass Dkhissi)
+
 ### 2.1.9
 * Resolve issue: `Mysql2::Error: Column 'position' in order clause is ambiguous`
 

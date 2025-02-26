@@ -32,3 +32,9 @@
 .ui-tooltip{
     width: min-content !Important;
 }
+
+#content .autoscroll {
+    overflow-x: visible;
+}
+
+

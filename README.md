@@ -8,6 +8,7 @@ I was unable to contact the author to update the Redmine plugin page.
 Thank you for your great work.
 
 ## Compatibility
+* Version 2.2.1 >= Redmine 4 (including Redmine 6)
 * Version 2.0 >= Redmine 4 (including Redmine 5)
 * Version 1.4 >= Redmine 4 (including Redmine 5)
 * Version 1.3 for = Redmine 4 ONLY
@@ -18,7 +19,7 @@ Currently there's no difference between 1.2 and 1.3 except Redmine 4 compatibili
 ## Features
 * Create to-do lists per project
 * Add individual issues with or without comments per to-do list (also cross project possible)
-* Or create to-do lists with solely text items
+* Or create to-do lists with solely text items (resolved)
 * Order these issues / items per drag and drop
 * Add and remove issues to/from to-do list by context menu (even bulk adding possible)
 * Autocomplete for issues (as with issue relations)
@@ -27,6 +28,7 @@ Currently there's no difference between 1.2 and 1.3 except Redmine 4 compatibili
 * Modify to-do list adherence from issue details and on edit
 * Add issue to to-do list on creation
 * Issue Filters and Columns
+* `Date` Context menu
 
 ## Remarks
 * The sorting functionality of the new "Issues Columns" currently operates only on the first element. This means that, when the column is sorted, only the first item in each row is considered for the sorting operation.
