@@ -8,7 +8,7 @@ class IssueTodoListItem < ActiveRecord::Base
   before_save :force_updated
   before_destroy :force_updated
 
-  serialize :data
+  serialize :data, coder: YAML, type: Array
 
   def force_updated
     todo_list = self.issue_todo_list
