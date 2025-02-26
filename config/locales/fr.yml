@@ -22,3 +22,8 @@ fr:
   issue_todo_lists_included_columns_for_issue_item: Inclure la colonne pour la tâche
   issue_todo_lists_included_columns_for_text_item: Inclure la colonne pour l'élément de texte
   issue_todo_lists_item_create_empty: Le champ de la tâche ne peut pas être vide
+  field_dates: Dates
+  label_enable_dates_context_menu: Activer les dates dans le menu contextuel
+  label_general_issue_todo_lists_settings: Paramètres généraux des listes de tâches pour les problèmes
+
+

@@ -33,3 +33,54 @@
     </ul>
   </li>
 <% end %>
+
+<% if Setting.plugin_redmine_issue_todo_lists2['enable_dates_context_menu'] && (@safe_attributes.include?('start_date') || @safe_attributes.include?('due_date')) %>
+  <% modal_id = "update-dates-modal-#{Time.current.to_i}" %>
+  <li>
+    <%= context_menu_link l(:field_dates), '#',
+                          :class => 'icon icon-calendar',
+                          :onclick => "showModal('#{modal_id}', '350px'); return false;" %>
+  </li>
+  <div id="<%= modal_id %>" style="display:none;">
+    <%= form_tag(
+          bulk_update_issues_path(:ids => @issue_ids, :back_url => @back),
+          :method => :patch, :id => nil
+        ) do %>
+      <% if @safe_attributes.include?('start_date') %>
+        <p>
+          <label for='issue_start_date'><%= l(:field_start_date) %></label>
+          <%= date_field_tag 'issue[start_date]', '', :value => (@issue ? @issue.start_date : nil), :size => 10, :id => nil %>
+          <%= calendar_for('issue_start_date') %>
+          <label class="inline">
+            <%= check_box_tag 'issue[start_date]', 'none', false, :id => nil, :data => {:disables => '#issue_start_date'} %>
+            <%= l(:button_clear) %>
+          </label>
+        </p>
+      <% end %>
+      <% if @safe_attributes.include?('due_date') %>
+        <p>
+          <label for='issue_due_date'><%= l(:field_due_date) %></label>
+          <%= date_field_tag 'issue[due_date]', '', :value => (@issue ? @issue.due_date : nil), :size => 10, :id => nil %>
+          <%= calendar_for('issue_due_date') %>
+          <label class="inline">
+            <%= check_box_tag 'issue[due_date]', 'none', false, :id => nil, :data => {:disables => '#issue_due_date'} %>
+            <%= l(:button_clear) %>
+          </label>
+        </p>
+      <% end %>
+      <p class="buttons">
+        <%= button_tag l(:button_submit), :name => nil, :onclick => "hideModal(this);$(this).closest('form').submit();", :data => { :disable_with => false } %>
+        <%= link_to_function l(:button_cancel), "hideModal(this);" %>
+      </p>
+    <% end %>
+  </div>
+  <%= javascript_tag do %>
+    $('input[data-disables]').change(function() {
+    if ($(this).prop('checked')){
+    $($(this).data('disables')).attr('disabled', true).val('');
+    } else {
+    $($(this).data('disables')).attr('disabled', false);
+    }
+    });
+  <% end %>
+<% end %>

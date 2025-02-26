@@ -1,0 +1,13 @@
+<%
+  def render_check_box(setting_key)
+    content_tag :p do
+      label_tag(setting_key, t("label_#{setting_key}")) +
+        check_box_tag("settings[#{setting_key}]", 1, @settings[setting_key])
+    end
+  end
+%>
+<fieldset class="box tabular settings">
+  <legend><%= l(:label_general_issue_todo_lists_settings) %></legend>
+  <%= render_check_box('enable_dates_context_menu') %>
+</fieldset>
+

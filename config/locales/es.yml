@@ -22,3 +22,6 @@ es:
   issue_todo_lists_included_columns_for_issue_item: Incluir columna para elemento de tarea
   issue_todo_lists_included_columns_for_text_item: Incluir columna para elemento de texto
   issue_todo_lists_item_create_empty: El campo de la tarea no puede estar vacío
+  field_dates: Fechas
+  label_enable_dates_context_menu: Habilitar fechas en el menú contextual
+  label_general_issue_todo_lists_settings: Configuración general de listas de tareas de problemas

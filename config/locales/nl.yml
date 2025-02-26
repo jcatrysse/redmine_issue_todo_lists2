@@ -22,3 +22,6 @@ nl:
   issue_todo_lists_included_columns_for_issue_item: Kolom opnemen voor taakelement
   issue_todo_lists_included_columns_for_text_item: Kolom opnemen voor tekstelement
   issue_todo_lists_item_create_empty: Taakveld kan niet leeg zijn
+  field_dates: Data
+  label_enable_dates_context_menu: Data inschakelen in het contextmenu
+  label_general_issue_todo_lists_settings: Algemene instellingen voor takenlijsten bij issues

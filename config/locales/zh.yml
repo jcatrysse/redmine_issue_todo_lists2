@@ -22,3 +22,6 @@ zh:
   issue_todo_lists_included_columns_for_issue_item: 包括任务项的列
   issue_todo_lists_included_columns_for_text_item: 包括文本项的列
   issue_todo_lists_item_create_empty: 任务字段不能为空
+  field_dates: 日期
+  label_enable_dates_context_menu: 启用上下文菜单中的日期
+  label_general_issue_todo_lists_settings: 问题待办事项列表的常规设置

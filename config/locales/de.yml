@@ -22,3 +22,6 @@ de:
   issue_todo_lists_included_columns_for_issue_item: Spalte für Aufgabenelement einbeziehen
   issue_todo_lists_included_columns_for_text_item: Spalte für Textelement einbeziehen
   issue_todo_lists_item_create_empty: Aufgabenfeld darf nicht leer sein
+  field_dates: Daten
+  label_enable_dates_context_menu: Datums im Kontextmenü aktivieren
+  label_general_issue_todo_lists_settings: Allgemeine Einstellungen für Aufgabenlisten bei Problemen

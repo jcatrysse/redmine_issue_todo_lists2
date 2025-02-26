@@ -20,6 +20,10 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
     permission :add_issue_todo_list_items_context_menu, {:issue_todo_lists => [:bulk_allocate_issues]}
   end
 
+  settings default: {
+    'enable_dates_context_menu' => true
+  }, partial: 'settings/issue_todo_lists_settings'
+
   menu :project_menu, :issue_todo_lists, { :controller => 'issue_todo_lists', :action => 'index' }, :caption => :issue_todo_lists_title, :param => :project_id, :after => :activity
 end
 
