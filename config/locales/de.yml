@@ -24,4 +24,5 @@ de:
   issue_todo_lists_item_create_empty: Aufgabenfeld darf nicht leer sein
   field_dates: Daten
   label_enable_dates_context_menu: Datums im Kontextmenü aktivieren
+  label_show_in_issue_sidebar: Aufgabenliste in der Seitenleiste des Problems anzeigen
   label_general_issue_todo_lists_settings: Allgemeine Einstellungen für Aufgabenlisten bei Problemen
