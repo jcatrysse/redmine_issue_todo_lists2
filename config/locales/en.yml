@@ -25,4 +25,5 @@ en:
   field_dates: Dates
   label_enable_dates_context_menu: Enable dates in the context menu
   label_show_in_issue_sidebar: Show todo lists in issue sidebar
+  label_show_in_issue_edit: Show todo lists when creating or editing issues
   label_general_issue_todo_lists_settings: General Issue Todo Lists Settings

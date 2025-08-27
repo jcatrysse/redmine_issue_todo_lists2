@@ -3,7 +3,7 @@
   User.current.admin? || User.current.allowed_to?(:add_issue_todo_list_items, list.project) ||
     (!issue.new_record? && User.current.allowed_to?(:remove_issue_todo_list_items, list.project) && list.issue_todo_list_items.exists?(issue_id: issue.id))
 end %>
-<% if allowed_todo_lists.count.positive? %>
+<% if allowed_todo_lists.count.positive? && Setting.plugin_redmine_issue_todo_lists2['show_in_issue_edit'] %>
   <p>
     <%= form.label :selected_todo_lists, l(:issue_todo_lists_title) %>
     <%= form.collection_select :issue_todo_list_ids, allowed_todo_lists, :id, lambda { |list| "#{list.project.name}: #{list.title}" }, {}, { multiple: true, selected: issue.issue_todo_list_ids } %>

@@ -22,7 +22,8 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
 
   settings default: {
     'enable_dates_context_menu' => true,
-    'show_in_issue_sidebar'     => true
+    'show_in_issue_sidebar'     => true,
+    'show_in_issue_edit'        => true
   }, partial: 'settings/issue_todo_lists_settings'
 
   menu :project_menu, :issue_todo_lists, { :controller => 'issue_todo_lists', :action => 'index' }, :caption => :issue_todo_lists_title, :param => :project_id, :after => :activity

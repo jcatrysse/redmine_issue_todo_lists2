@@ -25,4 +25,5 @@ fr:
   field_dates: Dates
   label_enable_dates_context_menu: Activer les dates dans le menu contextuel
   label_show_in_issue_sidebar: Afficher les listes de tâches dans la barre latérale du problème
+  label_show_in_issue_edit: Afficher les listes de tâches lors de la création ou de la modification de problèmes
   label_general_issue_todo_lists_settings: Paramètres généraux des listes de tâches pour les problèmes
