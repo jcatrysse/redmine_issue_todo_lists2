@@ -8,13 +8,15 @@ I was unable to contact the author to update the Redmine plugin page.
 Thank you for your great work.
 
 ## Compatibility
+* Version 2.2.2 >= Redmine 4 (including Redmine 6)
 * Version 2.2.1 >= Redmine 4 (including Redmine 6)
 * Version 2.0 >= Redmine 4 (including Redmine 5)
 * Version 1.4 >= Redmine 4 (including Redmine 5)
 * Version 1.3 for = Redmine 4 ONLY
-* Version 1.2 for <= Redmine 3.4 
- 
+* Version 1.2 for <= Redmine 3.4
+
 Currently there's no difference between 1.2 and 1.3 except Redmine 4 compatibility
+Version 2.2.2 introduces settings to show or hide to-do lists in the issue sidebar and edit form.
 
 ## Features
 * Create to-do lists per project

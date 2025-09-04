@@ -24,4 +24,6 @@ zh:
   issue_todo_lists_item_create_empty: 任务字段不能为空
   field_dates: 日期
   label_enable_dates_context_menu: 启用上下文菜单中的日期
+  label_show_in_issue_sidebar: 在问题侧边栏中显示待办事项列表
+  label_show_in_issue_edit: 创建或编辑问题时显示待办事项列表
   label_general_issue_todo_lists_settings: 问题待办事项列表的常规设置

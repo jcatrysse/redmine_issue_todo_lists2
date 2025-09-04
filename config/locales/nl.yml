@@ -24,4 +24,6 @@ nl:
   issue_todo_lists_item_create_empty: Taakveld kan niet leeg zijn
   field_dates: Data
   label_enable_dates_context_menu: Data inschakelen in het contextmenu
+  label_show_in_issue_sidebar: Toon takenlijst in de issue zijbalk
+  label_show_in_issue_edit: Toon takenlijst bij het creëren of bewerken van issues
   label_general_issue_todo_lists_settings: Algemene instellingen voor takenlijsten bij issues

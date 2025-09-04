@@ -24,4 +24,6 @@ es:
   issue_todo_lists_item_create_empty: El campo de la tarea no puede estar vacío
   field_dates: Fechas
   label_enable_dates_context_menu: Habilitar fechas en el menú contextual
+  label_show_in_issue_sidebar: Mostrar listas de tareas pendientes en la barra lateral de problemas
+  label_show_in_issue_edit: Mostrar listas de tareas pendientes al crear o editar problemas
   label_general_issue_todo_lists_settings: Configuración general de listas de tareas de problemas

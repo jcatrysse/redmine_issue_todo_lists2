@@ -2,7 +2,7 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
   name 'Issue To-do Lists Plugin (reworked)'
   author 'Jan Catrysse'
   description 'Organize issues in to-do lists by manually ordering their priority'
-  version '2.2.1'
+  version '2.2.2'
   url 'https://github.com/jcatrysse/redmine_issue_todo_lists2'
   author_url 'https://github.com/jcatrysse'
 
@@ -21,7 +21,9 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
   end
 
   settings default: {
-    'enable_dates_context_menu' => true
+    'enable_dates_context_menu' => true,
+    'show_in_issue_sidebar'     => true,
+    'show_in_issue_edit'        => true
   }, partial: 'settings/issue_todo_lists_settings'
 
   menu :project_menu, :issue_todo_lists, { :controller => 'issue_todo_lists', :action => 'index' }, :caption => :issue_todo_lists_title, :param => :project_id, :after => :activity
