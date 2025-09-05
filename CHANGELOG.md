@@ -2,6 +2,7 @@
 ### 2.2.2
 * Add options to toggle issue sidebar and edit-form to-do lists
 * Apply query optimizations and localization updates
+* Resolve issues with legacy todo lists and migration
 
 ### 2.2.1
 * Add YAML coder to serializer, for Rails 7 / Redmine 6 compatibility (thank you bytemine Team)
