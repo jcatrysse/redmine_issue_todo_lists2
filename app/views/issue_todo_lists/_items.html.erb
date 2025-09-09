@@ -28,22 +28,23 @@
         </div>
       </td>
     <% else %>
-      <td colspan="<%= issue_columns.count + 1 - @todo_list.included_fields.count %>"}>
-        <div class="wiki">
-          <%= textilizable(item.comment) %>
-        </div>
-      </td>
-      <% @todo_list.included_fields.each do |fieldName| %>
-        <% column = @issue_query.available_columns.find {|aColumn| aColumn.name.to_s === fieldName.to_s} %>
-        
-        <% value = item.data.find {|itemData| itemData[:field].to_s === fieldName.to_s} if item.data %>
-        <% value = value ? value[:value] : nil %>
+      <% issue_columns.each do |column| %>
+        <% value = nil %>
+        <% if @todo_list.included_fields.include?(column.name.to_s) %>
+          <% value = item.data&.find { |itemData| itemData[:field].to_s == column.name.to_s } %>
+          <% value = value ? value[:value] : nil %>
+        <% end %>
         <td>
-          <% if column && value.present? %>
+          <% if value.present? %>
             <strong><%= column.caption %>:</strong> <%= value %>
           <% end %>
         </td>
       <% end %>
+      <td>
+        <div class="wiki">
+          <%= textilizable(item.comment) %>
+        </div>
+      </td>
     <% end %>
     <td class="buttons">
     <% if User.current.admin? || User.current.allowed_to?(:update_issue_todo_list_items, @project) %>
