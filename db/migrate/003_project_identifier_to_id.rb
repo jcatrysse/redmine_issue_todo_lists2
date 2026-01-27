@@ -3,11 +3,20 @@ class ProjectIdentifierToId < ActiveRecord::Migration[4.2]
     unless column_exists?(:issue_todo_lists, :project_id)
       add_column :issue_todo_lists, :project_id, :integer, null: true
 
-      # Changed UPDATE FROM to INNER JOIN to comply with MySQL syntax
+      # Improve cross‑DB compatibility
       execute <<~SQL.squish
         UPDATE issue_todo_lists
-        INNER JOIN projects ON issue_todo_lists.project_identifier = projects.identifier
-        SET issue_todo_lists.project_id = projects.id
+        SET project_id = (
+          SELECT projects.id
+          FROM projects
+          WHERE projects.identifier = issue_todo_lists.project_identifier
+        )
+        WHERE project_identifier IS NOT NULL
+          AND EXISTS (
+            SELECT 1
+            FROM projects
+            WHERE projects.identifier = issue_todo_lists.project_identifier
+          )
       SQL
     end
 
@@ -18,11 +27,20 @@ class ProjectIdentifierToId < ActiveRecord::Migration[4.2]
     unless column_exists?(:issue_todo_lists, :project_identifier)
       add_column :issue_todo_lists, :project_identifier, :string, null: true
 
-      # Changed UPDATE FROM to INNER JOIN to comply with MySQL syntax
+      # Improve cross‑DB compatibility
       execute <<~SQL.squish
         UPDATE issue_todo_lists
-        INNER JOIN projects ON issue_todo_lists.project_id = projects.id
-        SET issue_todo_lists.project_identifier = projects.identifier
+        SET project_identifier = (
+          SELECT projects.identifier
+          FROM projects
+          WHERE projects.id = issue_todo_lists.project_id
+        )
+        WHERE project_id IS NOT NULL
+          AND EXISTS (
+            SELECT 1
+            FROM projects
+            WHERE projects.id = issue_todo_lists.project_id
+          )
       SQL
     end
 
