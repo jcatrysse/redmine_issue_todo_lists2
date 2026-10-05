@@ -1,4 +1,9 @@
 # CHANGELOG
+### 2.3.0
+* Remove the `Dates` context menu. It moved to [redmine_context_menu_actions](https://github.com/jcatrysse/redmine_context_menu_actions).  
+  Install that plugin before upgrading if you use the Dates menu.
+* Add a test suite, run it with the `.codex` scripts
+
 ### 2.2.2
 * Add options to toggle issue sidebar and edit-form to-do lists
 * Apply query optimizations and localization updates

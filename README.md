@@ -8,6 +8,7 @@ I was unable to contact the author to update the Redmine plugin page.
 Thank you for your great work.
 
 ## Compatibility
+* Version 2.3.0 >= Redmine 4 (tested on Redmine 5.1, 6.0 and 6.1)
 * Version 2.2.2 >= Redmine 4 (including Redmine 6)
 * Version 2.2.1 >= Redmine 4 (including Redmine 6)
 * Version 2.0 >= Redmine 4 (including Redmine 5)
@@ -30,7 +31,8 @@ Version 2.2.2 introduces settings to show or hide to-do lists in the issue sideb
 * Modify to-do list adherence from issue details and on edit
 * Add issue to to-do list on creation
 * Issue Filters and Columns
-* `Date` Context menu
+
+The `Dates` context menu moved to [redmine_context_menu_actions](https://github.com/jcatrysse/redmine_context_menu_actions) in version 2.3.0.
 
 ## Remarks
 * The sorting functionality of the new "Issues Columns" currently operates only on the first element. This means that, when the column is sorted, only the first item in each row is considered for the sorting operation.
@@ -51,6 +53,11 @@ See [screenshots folder](https://github.com/jcatrysse/redmine_issue_todo_lists2/
 * Update plugin with Git or download sources manually
 * Run migration as described above
 * Restart Redmine
+
+## Tests
+* `./.codex/redmine_clone.sh 6.1-stable` (or `5.1-stable`, `6.0-stable`)
+* `./.codex/test_setup.sh`
+* `./.codex/test_plugin.sh`
 
 ## Uninstall
 * Run migration backwards: `bundle exec rake redmine:plugins:migrate NAME=redmine_issue_todo_lists2 VERSION=0 RAILS_ENV=production`
