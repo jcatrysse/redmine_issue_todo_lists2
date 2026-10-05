@@ -16,12 +16,22 @@ en:
   issue_todo_label_edit_comment: Edit Comment
   issue_todo_label_order: Order
   issue_todo_lists_edit_success: To-do list was successfully updated
-  issue_todo_lists_destroy_success: To-list was successfully deleted
+  issue_todo_lists_destroy_success: To-do list was successfully deleted
   issue_todo_lists_remove_closed_issues: Remove closed issues
   issue_todo_lists_included_columns: Include columns
   issue_todo_lists_included_columns_for_issue_item: Include column for issue item
   issue_todo_lists_included_columns_for_text_item: Include column for text item
-  issue_todo_lists_item_create_empty: Issue field cannot be blank
+  issue_todo_lists_item_create_empty: Enter an issue or a comment
   label_show_in_issue_sidebar: Show todo lists in issue sidebar
   label_show_in_issue_edit: Show todo lists when creating or editing issues
   label_general_issue_todo_lists_settings: General Issue Todo Lists Settings
+  issue_todo_lists_remove_item: "Remove from to-do list"
+  issue_todo_lists_add_to_list: "Add to to-do list"
+  issue_todo_lists_listed: "In this to-do list"
+  issue_todo_lists_order_error: "Error while ordering. Please reload the page."
+  issue_todo_lists_closed_issue_not_allowed: "Closed issues cannot be added to this to-do list"
+  issue_todo_lists_cm_add_item: "%{list}: add item"
+  issue_todo_lists_cm_unlist_item: "%{list}: unlist item"
+  issue_todo_lists_cm_add_all: "%{list}: add all items"
+  issue_todo_lists_cm_unlist_all: "%{list}: unlist all items"
+  issue_todo_lists_cm_add_some: "%{list}: add %{count} of %{total} items"

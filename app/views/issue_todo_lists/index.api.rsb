@@ -9,8 +9,16 @@ api.array :todo_lists do
       api.last_updated todo_list.last_updated
       api.last_updated_by(:id => todo_list.last_updated_by.id, :firstname => todo_list.last_updated_by.firstname, :lastname => todo_list.last_updated_by.lastname) unless todo_list.last_updated_by.nil?
       api.remove_closed_issues todo_list.remove_closed_issues
-      api.included_columns todo_list.included_columns unless todo_list.included_columns.length == 0
-      api.included_fields todo_list.included_fields unless todo_list.included_fields.length == 0
+      if todo_list.included_columns.any?
+        api.array :included_columns do
+          todo_list.included_columns.each { |column| api.column column }
+        end
+      end
+      if todo_list.included_fields.any?
+        api.array :included_fields do
+          todo_list.included_fields.each { |field| api.field field }
+        end
+      end
     end
   end
 end

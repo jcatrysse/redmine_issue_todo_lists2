@@ -3,8 +3,8 @@
 require_relative 'spec_helper'
 
 RSpec.describe 'plugin registration' do
-  it 'is registered as version 2.3.0' do
-    expect(plugin.version).to eq('2.3.0')
+  it 'is registered as version 2.4.0' do
+    expect(plugin.version).to eq('2.4.0')
   end
 
   it 'documents the registered version on top of the changelog and the compatibility list' do
@@ -21,7 +21,8 @@ RSpec.describe 'plugin registration' do
     files << File.join(RITL_ROOT, 'init.rb')
     leftovers = /enable_dates_context_menu|field_dates|update-dates-modal|data-disables/
 
-    expect(files.select { |f| File.read(f, :encoding => 'UTF-8').match?(leftovers) }).to eq([])
+    # binread: an image under assets must not break the scan.
+    expect(files.select { |f| File.binread(f).match?(leftovers) }).to eq([])
   end
 
   it 'adds no script to the issues context menu' do

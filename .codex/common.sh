@@ -6,7 +6,7 @@
 #   REDMINE_DIR     checkout to work in (default: redmine)
 #   MISE_BIN        mise executable, used only when it is present
 #   RITL_RUBY       pin the Ruby version instead of deriving it from the Gemfile
-#   RITL_RUBY_MAX   newest Ruby that actually exists (default: 3.4)
+#   RITL_RUBY_MAX   newest Ruby to pick (default: 3.4)
 
 REDMINE_DIR="${REDMINE_DIR:-redmine}"
 MISE_BIN="${MISE_BIN:-mise}"
@@ -24,8 +24,8 @@ ritl_version_le() {
 
 # Redmine pins a range rather than a version, so derive one just below the upper
 # bound: "< 3.5.0" means 3.4 is the newest Ruby the checkout accepts. Redmine 7
-# allows "< 4.1.0", which would derive a Ruby 4.0 that does not exist yet, so the
-# result is clamped to RITL_RUBY_MAX and floored at the lower bound.
+# allows "< 4.1.0", which would derive Ruby 4.0, so the result is clamped to
+# RITL_RUBY_MAX and floored at the lower bound.
 ritl_detect_ruby_version() {
   local gemfile="$REDMINE_DIR/Gemfile" line lower upper major minor candidate
 
@@ -39,7 +39,7 @@ ritl_detect_ruby_version() {
   line="$(grep -E "^[[:space:]]*ruby[[:space:]]" "$gemfile" | head -n 1 || true)"
   [ -n "$line" ] || return 0
 
-  lower="$(printf '%s' "$line" | sed -E -n "s/.*>=[[:space:]]*['\"]([0-9]+\.[0-9]+).*/\1/p")"
+  lower="$(printf '%s' "$line" | sed -E -n "s/.*>=[[:space:]]*['\"]?([0-9]+\.[0-9]+).*/\1/p")"
   upper="$(printf '%s' "$line" | sed -E -n "s/.*<[[:space:]]*['\"]?([0-9]+)\.([0-9]+).*/\1.\2/p")"
 
   if [ -n "$upper" ]; then

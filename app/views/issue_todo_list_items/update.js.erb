@@ -1,0 +1,8 @@
+$('#issue-todo-list-table > tbody').html('<%= escape_javascript(render :partial => 'issue_todo_lists/items') %>');
+$('#show-right-box').html('<%= escape_javascript(render :partial => 'issue_todo_lists/show/right_box') %>');
+<% if @item.errors.empty? %>
+  $('#edit_item_comment').removeData('changed');
+  $('#update_issue_todo_list_items_wrapper').hide();
+<% else %>
+  $('#edit_item_comment_box .errors').html('<%= escape_javascript(error_messages_for 'item') %>');
+<% end %>

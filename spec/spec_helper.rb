@@ -45,10 +45,27 @@ module RitlSpecHelpers
                                 :position => todo_list.get_max_position)
     end
   end
+
+  def add_text_item(todo_list, comment, data = [])
+    IssueTodoListItem.create!(:issue_todo_list => todo_list, :comment => comment, :data => data,
+                              :position => todo_list.get_max_position)
+  end
+
+  RITL_PERMISSIONS = [:add_issue_todo_lists, :view_issue_todo_lists, :edit_issue_todo_lists, :delete_issue_todo_lists, :add_issue_todo_list_items, :order_issue_todo_list_items,
+                      :remove_issue_todo_list_items, :update_issue_todo_list_items, :add_issue_todo_list_items_context_menu].freeze
+
+  # Turns the module on and gives the role the listed plugin permissions,
+  # all of them by default.
+  def enable_todo_lists(project, role: Role.find(1), permissions: RITL_PERMISSIONS)
+    project.enable_module!(:issue_todo_lists)
+    permissions.each { |permission| role.add_permission!(permission) }
+  end
 end
 
 RSpec.configure do |config|
   config.expect_with(:rspec) { |c| c.syntax = :expect }
+  # A typo in a path or filter must not pass as a green run.
+  config.fail_if_no_examples = true
   config.include RitlSpecHelpers
 
   config.before(:suite) do

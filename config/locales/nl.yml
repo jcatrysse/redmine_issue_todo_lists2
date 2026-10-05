@@ -21,7 +21,17 @@ nl:
   issue_todo_lists_included_columns: Kolommen opnemen
   issue_todo_lists_included_columns_for_issue_item: Kolom opnemen voor taakelement
   issue_todo_lists_included_columns_for_text_item: Kolom opnemen voor tekstelement
-  issue_todo_lists_item_create_empty: Taakveld kan niet leeg zijn
+  issue_todo_lists_item_create_empty: Geef een taak of een opmerking in
   label_show_in_issue_sidebar: Toon takenlijst in de issue zijbalk
   label_show_in_issue_edit: Toon takenlijst bij het creëren of bewerken van issues
   label_general_issue_todo_lists_settings: Algemene instellingen voor takenlijsten bij issues
+  issue_todo_lists_remove_item: "Uit de takenlijst verwijderen"
+  issue_todo_lists_add_to_list: "Aan de takenlijst toevoegen"
+  issue_todo_lists_listed: "In deze takenlijst"
+  issue_todo_lists_order_error: "Fout bij het sorteren. Herlaad de pagina."
+  issue_todo_lists_closed_issue_not_allowed: "Gesloten taken kunnen niet aan deze takenlijst worden toegevoegd"
+  issue_todo_lists_cm_add_item: "%{list}: taak toevoegen"
+  issue_todo_lists_cm_unlist_item: "%{list}: taak verwijderen"
+  issue_todo_lists_cm_add_all: "%{list}: alle taken toevoegen"
+  issue_todo_lists_cm_unlist_all: "%{list}: alle taken verwijderen"
+  issue_todo_lists_cm_add_some: "%{list}: %{count} van %{total} taken toevoegen"

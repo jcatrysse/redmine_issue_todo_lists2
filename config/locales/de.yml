@@ -21,7 +21,17 @@ de:
   issue_todo_lists_included_columns: Spalten einbeziehen
   issue_todo_lists_included_columns_for_issue_item: Spalte für Aufgabenelement einbeziehen
   issue_todo_lists_included_columns_for_text_item: Spalte für Textelement einbeziehen
-  issue_todo_lists_item_create_empty: Aufgabenfeld darf nicht leer sein
+  issue_todo_lists_item_create_empty: Geben Sie eine Aufgabe oder einen Kommentar ein
   label_show_in_issue_sidebar: Aufgabenliste in der Seitenleiste des Problems anzeigen
   label_show_in_issue_edit: Zeigen Sie beim Erstellen oder Bearbeiten von Problemen Aufgabenlisten an
   label_general_issue_todo_lists_settings: Allgemeine Einstellungen für Aufgabenlisten bei Problemen
+  issue_todo_lists_remove_item: "Aus der Aufgabenliste entfernen"
+  issue_todo_lists_add_to_list: "Zur Aufgabenliste hinzufügen"
+  issue_todo_lists_listed: "In dieser Aufgabenliste"
+  issue_todo_lists_order_error: "Fehler beim Sortieren. Bitte laden Sie die Seite neu."
+  issue_todo_lists_closed_issue_not_allowed: "Geschlossene Aufgaben können dieser Aufgabenliste nicht hinzugefügt werden"
+  issue_todo_lists_cm_add_item: "%{list}: Aufgabe hinzufügen"
+  issue_todo_lists_cm_unlist_item: "%{list}: Aufgabe entfernen"
+  issue_todo_lists_cm_add_all: "%{list}: alle Aufgaben hinzufügen"
+  issue_todo_lists_cm_unlist_all: "%{list}: alle Aufgaben entfernen"
+  issue_todo_lists_cm_add_some: "%{list}: %{count} von %{total} Aufgaben hinzufügen"

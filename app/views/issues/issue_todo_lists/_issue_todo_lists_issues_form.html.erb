@@ -1,11 +1,17 @@
-<% todo_lists = IssueTodoList.where(project_id: issue.project.self_and_ancestors.ids).order('project_id', 'title') %>
+<% todo_lists = IssueTodoList.visible.where(project_id: issue.project.self_and_ancestors.ids).includes(:project).order('project_id', 'title') %>
+<% listed_ids = issue.new_record? ? [] : issue.issue_todo_list_items.pluck(:issue_todo_list_id) %>
 <% allowed_todo_lists = todo_lists.select do |list|
-  User.current.admin? || User.current.allowed_to?(:add_issue_todo_list_items, list.project) ||
-    (!issue.new_record? && User.current.allowed_to?(:remove_issue_todo_list_items, list.project) && list.issue_todo_list_items.exists?(issue_id: issue.id))
+  User.current.allowed_to?(:add_issue_todo_list_items, list.project) ||
+    (listed_ids.include?(list.id) && User.current.allowed_to?(:remove_issue_todo_list_items, list.project))
 end %>
-<% if allowed_todo_lists.any? && Setting.plugin_redmine_issue_todo_lists2['show_in_issue_edit'] %>
+<% if allowed_todo_lists.any? && RedmineIssueTodoLists::Settings.enabled?('show_in_issue_edit') %>
+  <% posted = params.dig(:issue, :issue_todo_list_ids) %>
+  <% posted_was = params[:issue_todo_list_ids_was] %>
+  <% selected = posted.is_a?(Array) ? posted.map(&:to_i) : listed_ids %>
+  <% shown = posted_was.is_a?(String) ? posted_was.split(',').map(&:to_i) : listed_ids %>
   <p>
-    <%= form.label :selected_todo_lists, l(:issue_todo_lists_title) %>
-    <%= form.collection_select :issue_todo_list_ids, allowed_todo_lists, :id, lambda { |list| "#{list.project.name}: #{list.title}" }, {}, { multiple: true, selected: issue.issue_todo_list_ids } %>
+    <%= form.label :issue_todo_list_ids, l(:issue_todo_lists_title) %>
+    <%= form.collection_select :issue_todo_list_ids, allowed_todo_lists, :id, lambda { |list| "#{list.project.name}: #{list.title}" }, {:selected => selected}, { multiple: true } %>
+    <%= hidden_field_tag 'issue_todo_list_ids_was', (shown & allowed_todo_lists.map(&:id)).join(','), :id => nil unless issue.new_record? %>
   </p>
 <% end %>

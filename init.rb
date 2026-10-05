@@ -2,21 +2,21 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
   name 'Issue To-do Lists Plugin (reworked)'
   author 'Jan Catrysse'
   description 'Organize issues in to-do lists by manually ordering their priority'
-  version '2.3.0'
+  version '2.4.0'
   url 'https://github.com/jcatrysse/redmine_issue_todo_lists2'
   author_url 'https://github.com/jcatrysse'
 
-  requires_redmine version_or_higher: '4.0'
+  requires_redmine version_or_higher: '5.1'
 
   project_module :issue_todo_lists do
     permission :add_issue_todo_lists, {:issue_todo_lists => [:new, :create]}
-    permission :view_issue_todo_lists, {:issue_todo_lists => [:index, :show]}
+    permission :view_issue_todo_lists, {:issue_todo_lists => [:index, :show]}, :read => true
     permission :edit_issue_todo_lists, {:issue_todo_lists => [:update, :edit]}
     permission :delete_issue_todo_lists, {:issue_todo_lists => [:destroy]}
-    permission :add_issue_todo_list_items, {:issue_todo_list_items => [:create]}
+    permission :add_issue_todo_list_items, {:issue_todo_list_items => [:create], :issue_todo_lists => [:bulk_allocate_issues]}
     permission :order_issue_todo_list_items, {:issue_todo_lists => [:update_item_order]}
     permission :remove_issue_todo_list_items, {:issue_todo_list_items => [:destroy]}
-    permission :update_issue_todo_list_items, {:issue_todo_list_items => [:update, :show, :edit]}
+    permission :update_issue_todo_list_items, {:issue_todo_list_items => [:update, :edit]}
     permission :add_issue_todo_list_items_context_menu, {:issue_todo_lists => [:bulk_allocate_issues]}
   end
 
@@ -28,6 +28,8 @@ Redmine::Plugin.register :redmine_issue_todo_lists2 do
   menu :project_menu, :issue_todo_lists, { :controller => 'issue_todo_lists', :action => 'index' }, :caption => :issue_todo_lists_title, :param => :project_id, :after => :activity
 end
 
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/icon'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/settings'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_details_bottom_hook'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_context_menu_end_hook'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/view_issues_form_details_bottom_hook'
@@ -35,6 +37,7 @@ require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/hooks/controller_issues_edit_after_save_hook'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_patch'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/project_patch'
+require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/user_patch'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/issue_query_patch'
 require File.dirname(__FILE__) + '/lib/redmine_issue_todo_lists/patches/queries_helper_patch'
 

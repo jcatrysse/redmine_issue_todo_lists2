@@ -10,13 +10,12 @@ class IssueTodoListTitles
   end
 
   def visible?(user = User.current)
-    return true if user.admin?
-    issue_todo_lists.any? { |list| list.visible?(user) }
+    visible_issue_todo_lists(user).any?
   end
 
   private
+
   def visible_issue_todo_lists(user)
-    return issue_todo_lists if user.admin?
     issue_todo_lists.select { |list| list.visible?(user) }
   end
 end

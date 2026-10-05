@@ -21,7 +21,17 @@ es:
   issue_todo_lists_included_columns: Incluir columnas
   issue_todo_lists_included_columns_for_issue_item: Incluir columna para elemento de tarea
   issue_todo_lists_included_columns_for_text_item: Incluir columna para elemento de texto
-  issue_todo_lists_item_create_empty: El campo de la tarea no puede estar vacío
+  issue_todo_lists_item_create_empty: Introduzca una tarea o un comentario
   label_show_in_issue_sidebar: Mostrar listas de tareas pendientes en la barra lateral de problemas
   label_show_in_issue_edit: Mostrar listas de tareas pendientes al crear o editar problemas
   label_general_issue_todo_lists_settings: Configuración general de listas de tareas de problemas
+  issue_todo_lists_remove_item: "Quitar de la lista de tareas"
+  issue_todo_lists_add_to_list: "Agregar a la lista de tareas"
+  issue_todo_lists_listed: "En esta lista de tareas"
+  issue_todo_lists_order_error: "Error al ordenar. Vuelva a cargar la página."
+  issue_todo_lists_closed_issue_not_allowed: "No se pueden agregar tareas cerradas a esta lista de tareas"
+  issue_todo_lists_cm_add_item: "%{list}: agregar tarea"
+  issue_todo_lists_cm_unlist_item: "%{list}: quitar tarea"
+  issue_todo_lists_cm_add_all: "%{list}: agregar todas las tareas"
+  issue_todo_lists_cm_unlist_all: "%{list}: quitar todas las tareas"
+  issue_todo_lists_cm_add_some: "%{list}: agregar %{count} de %{total} tareas"

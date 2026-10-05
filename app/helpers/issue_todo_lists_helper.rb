@@ -16,70 +16,47 @@ module IssueTodoListsHelper
     params[:action]
   end
 
-  def self.has_todo_lists_permission?(projects)
-    return true if User.current.admin?
-    projects.each do |project|
-      return true if User.current.allowed_to?(:view_issue_todo_lists, project)
-    end
-    false
-  end
-
+  # Lists of the issues' projects and their parents, where the user may use
+  # the context menu. With a single issue, also the lists that hold it.
   def self.get_all_todo_lists_from_project_issues(issues)
-    todo_lists = Set.new
-    issues.each do |issue|
-      # Get to-do lists of project and all parent projects
-      projects = issue.project.self_and_ancestors
-      projects.each do |sub_project|
-        sub_project.issue_todo_lists.each do |todo_list|
-          todo_lists.add(todo_list)
-        end
-      end
-    end
+    project_ids = issues.map(&:project).uniq.flat_map { |project| project.self_and_ancestors.ids }.uniq
+    todo_lists = IssueTodoList.where(project_id: project_ids)
+    todo_lists = todo_lists.or(IssueTodoList.where(id: issues[0].issue_todo_list_items.select(:issue_todo_list_id))) if issues.one?
 
-    # If only one issue is selected: Add all allocated to-do lists anyway
-    if issues.count == 1
-      issues[0].issue_todo_lists.each do |todo_list|
-        todo_lists.add(todo_list)
-      end
-    end
-
-    todo_lists.keep_if { |todo_list| User.current.admin? || User.current.allowed_to?(:add_issue_todo_list_items_context_menu, todo_list.project) }
-    todo_lists.to_a.sort! { |a,b| a.title <=> b.title }
+    allowed_projects = Project.allowed_to(User.current, :add_issue_todo_list_items_context_menu)
+    todo_lists.visible.where(project_id: allowed_projects.select(:id)).includes(:project).to_a.sort_by { |list| [list.title.to_s.downcase, list.id] }
   end
 
-  def todo_list_items_to_csv(todo_list, issue_query)
-    encoding = 'UTF-8'
-    bom = "\uFEFF" # Byte Order Mark (BOM)
-    export = FCSV.generate(:col_sep => l(:general_csv_separator)) do |csv|
-      if todo_list.included_columns.count > 0
-        issue_columns = issue_query.available_columns.select {|column| todo_list.included_columns.include?(column.name.to_s)}
-      else
-        issue_columns = issue_query.available_columns.select {|column| issue_query.columns.include?(column)}
-      end
+  # Columns shown for the items of a list, in the order of the query.
+  def todo_list_issue_columns(todo_list, issue_query)
+    if todo_list.included_columns.any?
+      issue_query.available_columns.select { |column| todo_list.included_columns.include?(column.name.to_s) }
+    else
+      issue_query.available_columns.select { |column| issue_query.columns.include?(column) }
+    end
+  end
 
-      issue_columns.unshift(
-        QueryColumn.new(:position,
-                        :caption => :issue_todo_label_order)
-      )
-      issue_columns.push(
-        QueryColumn.new(:comments,
-                        :caption => :field_comments)
-      )
+  def todo_list_items_to_csv(todo_list, items, issue_query)
+    issue_columns = todo_list_issue_columns(todo_list, issue_query)
+    # UTF-8 unless asked otherwise: there is no export dialog to pick one.
+    Redmine::Export::CSV.generate(:encoding => params[:encoding].presence || 'UTF-8') do |csv|
+      csv << ([l(:issue_todo_label_order)] + issue_columns.map { |c| c.caption.to_s } + [l(:field_comments)])
 
-      csv << issue_columns.map { |c| c.caption.to_s }
-
-      issue_columns = issue_columns.drop(1)
-      issue_columns.pop
-      todo_list.issue_todo_list_items.each_with_index do |item, itemIdx|
-        fields = []
-        fields.push(item.position)
+      items.each do |item|
+        fields = [item.position]
         issue_columns.each do |column|
-          fields.push(csv_content(column, item.issue))
+          fields << (item.issue ? csv_content(column, item.issue) : todo_list_item_data_value(todo_list, item, column))
         end
-        fields.push(item.comment)
-        csv << fields.collect { |c| Redmine::CodesetUtil.from_utf8(c.to_s, encoding) }
+        fields << item.comment
+        csv << fields
       end
     end
-    bom + export
+  end
+
+  # The value of a text item for a column, when the list includes that field.
+  def todo_list_item_data_value(todo_list, item, column)
+    return nil unless todo_list.included_fields.include?(column.name.to_s)
+
+    item.data_value(column.name)
   end
 end

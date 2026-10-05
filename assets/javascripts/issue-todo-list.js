@@ -26,23 +26,18 @@
     };
 
     var updateOrder = function(e, ui) {
+        var table = $('#issue-todo-list-table');
         var itemOrder = $('#issue-todo-list-table > tbody').sortable('serialize', {
             key: 'item[]'
         });
 
         $.ajax({
             type: 'POST',
-            url: window.location.href + '/update_item_order',
+            url: table.data('reorder-url'),
             data: itemOrder,
-            dataType: 'html',
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('Accept', 'text/javascript');
-            },
-            success: function(response) {
-                eval(response);
-            },
+            dataType: 'script',
             error: function() {
-                alert('Error while ordering. Please reload the page.');
+                alert(table.data('reorder-error'));
             }}
         );
 
@@ -51,9 +46,8 @@
 
     $(document).ready(function() {
         $('#issue-todo-list-table.sortable > tbody').sortable({
-            cancel: 'a',
-            itemSelector: 'tr',
-            placeholder: '<tr class="placeholder"/>',
+            cancel: 'a, input',
+            placeholder: 'issue-todo-list-placeholder',
             axis: "y",
             forcePlaceholderSize: true,
             opacity: 0.5,

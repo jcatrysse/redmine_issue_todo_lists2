@@ -17,18 +17,20 @@ module RedmineIssueTodoLists
 
       module InstanceMethods
         def remove_todo_list_allocations
-          if self.status.is_closed && self.status != self.status_was
-            self.issue_todo_list_items.each do |item|
-              if item.issue_todo_list.remove_closed_issues
-                item.destroy
-              end
-            end
+          return unless saved_change_to_status_id? && status&.is_closed?
+
+          issue_todo_list_items.includes(:issue_todo_list).each do |item|
+            item.destroy if item.issue_todo_list.remove_closed_issues
           end
         end
 
-        def todolists_with_positions
-          todolists = IssueTodoList.joins(:issue_todo_list_items).where(issue_todo_list_items: { issue_id: id })
-          todolists.map do |todolist|
+        # Lists the user may view that hold this issue, with its position in each.
+        def todolists_with_positions(user = User.current)
+          items = IssueTodoListItem.joins(:issue_todo_list)
+                                   .where(issue_id: id, issue_todo_list_id: IssueTodoList.visible(user).select(:id))
+                                   .includes(:issue_todo_list)
+          items.map do |item|
+            todolist = item.issue_todo_list
             {
               id: todolist.id,
               project_id: todolist.project_id,
@@ -36,19 +38,21 @@ module RedmineIssueTodoLists
               description: todolist.description,
               last_updated: todolist.last_updated,
               remove_closed_issues: todolist.remove_closed_issues,
-              position: todolist.issue_todo_list_items.find_by(issue_id: id).position
+              position: item.position
             }
           end
         end
 
+        # Both columns use the same order, so titles and positions line up.
         def issue_todo_list_titles
-          issue_todo_lists = IssueTodoList.joins(:issue_todo_list_items).where(issue_todo_list_items: { issue_id: id })
-          IssueTodoListTitles.new(issue_todo_lists)
+          IssueTodoListTitles.new(issue_todo_lists.reorder("#{IssueTodoList.table_name}.title", "#{IssueTodoList.table_name}.id"))
         end
 
         def issue_todo_list_item_orders
-          issue_todo_list_items = IssueTodoListItem.joins(:issue_todo_list).where(issue_id: id)
-          IssueTodoListItemOrders.new(issue_todo_list_items)
+          IssueTodoListItemOrders.new(
+            issue_todo_list_items.joins(:issue_todo_list).includes(:issue_todo_list)
+                                 .reorder("#{IssueTodoList.table_name}.title", "#{IssueTodoList.table_name}.id")
+          )
         end
       end
     end

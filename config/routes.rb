@@ -3,7 +3,7 @@ scope '/projects/:project_id', :as => 'project' do
   resources :issue_todo_lists do
     post :update_item_order, on: :member
     post :bulk_allocate_issues, on: :member
-    resources :items, controller: 'issue_todo_list_items', only: [:create, :destroy, :update, :show, :edit] do
+    resources :items, controller: 'issue_todo_list_items', only: [:create, :destroy, :update, :edit] do
       member do
         get 'edit', :to => 'issue_todo_list_items#edit'
       end

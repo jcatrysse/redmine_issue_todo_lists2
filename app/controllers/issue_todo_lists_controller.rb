@@ -1,13 +1,14 @@
 class IssueTodoListsController < ApplicationController
 
-  before_action :find_project, :except => [:bulk_allocate_issues]
+  before_action :find_project
   before_action :find_todo_list, :only => [:show, :edit, :update, :destroy, :update_item_order, :bulk_allocate_issues]
+  before_action :authorize_view, :only => [:update_item_order]
 
   accept_api_auth :index, :show
 
   include IssueTodoListsHelper
   def index
-    @todo_lists = IssueTodoList.where(project_id: @project.id).order('id')
+    @todo_lists = @project.issue_todo_lists.order('id')
     respond_to do |format|
       format.api
       format.html { render action: 'index', layout: false if request.xhr? }
@@ -34,6 +35,7 @@ class IssueTodoListsController < ApplicationController
         }
       end
     else
+      @issue_query = IssueQuery.new
       respond_to do |format|
         format.html { render 'form' }
       end
@@ -41,12 +43,12 @@ class IssueTodoListsController < ApplicationController
   end
 
   def show
-    @todo_list_items = @todo_list.issue_todo_list_items
+    @todo_list_items = @todo_list.visible_items_for_display
     @issue_query = IssueQuery.new
     respond_to do |format|
       format.api
       format.html { render action: 'show', layout: false if request.xhr? }
-      format.csv  { send_data(todo_list_items_to_csv(@todo_list, @issue_query), :type => 'text/csv; header=present', :filename => 'issue_todo_list_items.csv') }
+      format.csv  { send_data(todo_list_items_to_csv(@todo_list, @todo_list_items, @issue_query), :type => 'text/csv; header=present', :filename => 'issue_todo_list_items.csv') }
     end
   end
 
@@ -62,6 +64,7 @@ class IssueTodoListsController < ApplicationController
       if @todo_list.update(issue_todo_list_params)
         format.html { redirect_to project_issue_todo_list_path(@project, @todo_list), notice: l(:issue_todo_lists_edit_success) }
       else
+        @issue_query = IssueQuery.new
         format.html { render 'form' }
       end
     end
@@ -71,59 +74,60 @@ class IssueTodoListsController < ApplicationController
     @todo_list.destroy
 
     respond_to do |format|
-      format.html { redirect_to :action => :index, notice: l(:issue_todo_lists_destroy_success) }
+      format.html { redirect_to project_issue_todo_lists_path(@project), notice: l(:issue_todo_lists_destroy_success) }
     end
   end
 
+  # Items the user cannot see keep their place; the others take the
+  # positions in the order they were posted.
   def update_item_order
-    items = params[:item]
-    items ||= []
+    ids = Array(params[:item]).map { |id| id.to_s.to_i }
+    items = @todo_list.visible_items.where(id: ids).index_by(&:id)
+    ordered = ids.map { |id| items[id] }.compact.uniq
 
-    items.each_with_index { |item_id, index|
-      item = IssueTodoListItem.find(item_id)
-      item.position = index + 1
-      item.save
-    }
-
-    respond_to do |format|
-      format.js {
-        # Refresh last_updated-info in instance
-        @todo_list = find_todo_list
-      }
+    positions =
+      if ordered.size == @todo_list.issue_todo_list_items.count
+        (1..ordered.size).to_a
+      else
+        ordered.map { |item| item.position.to_i }.sort
+      end
+    IssueTodoListItem.transaction do
+      ordered.each_with_index do |item, index|
+        item.update_column(:position, positions[index]) unless item.position == positions[index]
+      end
+      @todo_list.mark_updated
     end
+    @todo_list_items = @todo_list.visible_items_for_display
+    @issue_query = IssueQuery.new
+
+    respond_to(&:js)
   end
 
+  # Used by the issue context menu and the issue sidebar.
   def bulk_allocate_issues
-    params[:issue_ids].each do |issue_id|
-      issue = Issue.find(issue_id)
-      found_list = false
-      # Is issue already allocated to selected to-do list?
-      issue.issue_todo_lists.each do |todo_list|
-        if todo_list == @todo_list
-          found_list = todo_list
-          break
-        end
+    ids = Array(params[:issue_ids]).map { |id| id.to_s.to_i }
+    # In the posted order, which becomes the order in the list.
+    issues = Issue.visible.where(:id => ids).sort_by { |issue| ids.index(issue.id) }
+    return render_404 if issues.empty?
+
+    listed_ids = @todo_list.issue_todo_list_items.where(:issue_id => issues.map(&:id)).pluck(:issue_id)
+    # A negative count is an unlist, as chosen in the menu, even when the
+    # list changed after the menu was opened.
+    if params[:list_count].to_i.negative?
+      return deny_access unless User.current.allowed_to?(:add_issue_todo_list_items_context_menu, @project) ||
+                                User.current.allowed_to?(:remove_issue_todo_list_items, @project)
+
+      @todo_list.issue_todo_list_items.where(:issue_id => listed_ids).destroy_all
+    else
+      errors = issues.reject { |issue| listed_ids.include?(issue.id) }.flat_map do |issue|
+        # Not saved when the list removes closed issues and this one is closed.
+        IssueTodoListItem.create(:issue_todo_list => @todo_list, :issue => issue, :position => @todo_list.get_max_position)
+                         .errors.full_messages
       end
-      if found_list
-        # Delete item if only all issues are to be deleted and issue is allocated to to-do list
-        if params[:issue_ids].count == -(params[:list_count].to_i)
-          found_list.issue_todo_list_items.each do |item|
-            if item.issue == issue
-              item.destroy
-            end
-          end
-        end
-      else
-        # Allocate issue to to-do list
-        item = IssueTodoListItem.new
-        item.issue_todo_list = @todo_list
-        item.position = @todo_list.get_max_position
-        item.issue = issue
-        item.save
-      end
+      flash[:error] = errors.uniq.to_sentence if errors.any?
     end
 
-    redirect_to params[:back_url]
+    redirect_back_or_default project_issue_todo_list_path(@project, @todo_list)
   end
 
   private
@@ -134,19 +138,23 @@ class IssueTodoListsController < ApplicationController
     render_404
   end
 
+  # The response shows the list, so the view permission is needed as well.
+  def authorize_view
+    deny_access unless User.current.allowed_to?(:view_issue_todo_lists, @project)
+  end
+
   def find_todo_list
-    @todo_list = IssueTodoList.find(params[:id])
+    @todo_list = @project.issue_todo_lists.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def issue_todo_list_params
-    if Gem::Version.new(Rails::VERSION::STRING) >= Gem::Version.new('4.0.0')
-      params[:issue_todo_list][:included_columns] ||= []
-      params[:issue_todo_list][:included_fields] ||= []
-      params.require(:issue_todo_list).permit(:title, :description, :remove_closed_issues, :included_columns => [], :included_fields => [])
-    else
-      params[:issue_todo_list]
-    end
+    list_params = params.require(:issue_todo_list)
+    raise ActionController::ParameterMissing, :issue_todo_list unless list_params.is_a?(ActionController::Parameters)
+
+    list_params[:included_columns] ||= []
+    list_params[:included_fields] ||= []
+    list_params.permit(:title, :description, :remove_closed_issues, :included_columns => [], :included_fields => [])
   end
 end

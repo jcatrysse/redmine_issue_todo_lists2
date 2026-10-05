@@ -1,8 +1,20 @@
 # CHANGELOG
+### 2.4.0
+* Support Redmine 7.0, require Redmine 5.1 or later
+* Security: check permissions, project and issue visibility on every to-do list action
+* Hide to-do lists of projects without the module, also for administrators
+* Fix the CSV export (UTF-8), the to-do list filter and the API for lists with text items
+* Fix sorting the issue list on the to-do list columns
+* Fix deleting a user who created or edited a to-do list
+* Fix lost to-do list items when an issue form opened earlier is saved
+* Show icons and translations correctly on Redmine 6 and 7
+* Run the migration, it adds indexes
+
 ### 2.3.0
 * Remove the `Dates` context menu. It moved to [redmine_context_menu_actions](https://github.com/jcatrysse/redmine_context_menu_actions).  
-  Install that plugin before upgrading if you use the Dates menu.
+  Install that plugin together with this upgrade if you use the Dates menu.
 * Add a test suite, run it with the `.codex` scripts
+* The plugin now ships a `Gemfile` (test gems only): run `bundle install` after updating
 
 ### 2.2.2
 * Add options to toggle issue sidebar and edit-form to-do lists

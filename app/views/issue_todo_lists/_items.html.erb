@@ -1,72 +1,50 @@
-<% if @todo_list.included_columns.count > 0 %>
-  <% issue_columns = @issue_query.available_columns.select {|column| @todo_list.included_columns.include?(column.name.to_s)} %>
-<% else %>
-  <% issue_columns = @issue_query.available_columns.select {|column| @issue_query.columns.include?(column)} %>
-<% end %>
-<% @todo_list_items.each_with_index do |item, itemIdx| %>
-  <tr id="issue-todo-list-item-<%= item.id %>" class="hascontextmenu <%= cycle 'odd', 'even' %>">
-  <%# Added Condition to check if item.issue exists before addind checkbox %>
-    <% if item.issue.nil? %>
-      <td class="checkbox">
-        <%= check_box_tag("ids[]", nil, false, :id => nil)  %>
-      </td>
-    <% else %>
-      <td class="checkbox">
-        <%= check_box_tag("ids[]", item.issue.id, false, :id => nil)  %>
-      </td>
-    <% end %>
+<% issue_columns = todo_list_issue_columns(@todo_list, @issue_query) %>
+<% can_update = User.current.allowed_to?(:update_issue_todo_list_items, @project) %>
+<% can_remove = User.current.allowed_to?(:remove_issue_todo_list_items, @project) %>
+<% @todo_list_items.each do |item| %>
+  <tr id="issue-todo-list-item-<%= item.id %>" class="<%= 'hascontextmenu ' if item.issue %><%= cycle 'odd', 'even' %>">
+    <td class="checkbox">
+      <%= check_box_tag("ids[]", item.issue.id, false, :id => nil) if item.issue %>
+    </td>
     <td class="issue-todo-list-item-order">
       <%= item.position %>
     </td>
-    <% unless item.issue.nil? %>
-      <% issue_columns.each do |column| %>
-        <td class="<%= column.name.to_s %>"><%= column_content(column, item.issue) %></td>
-      <% end %>
-      <td>
-        <div class="wiki">
-          <%= textilizable(item.comment) %>
-        </div>
-      </td>
-    <% else %>
-      <% issue_columns.each do |column| %>
-        <% value = nil %>
-        <% if @todo_list.included_fields.include?(column.name.to_s) %>
-          <% value = item.data&.find { |itemData| itemData[:field].to_s == column.name.to_s } %>
-          <% value = value ? value[:value] : nil %>
-        <% end %>
+    <% issue_columns.each do |column| %>
+      <% if item.issue %>
+        <td class="<%= column.css_classes %>"><%= column_content(column, item.issue) %></td>
+      <% else %>
+        <% value = todo_list_item_data_value(@todo_list, item, column) %>
         <td>
           <% if value.present? %>
             <strong><%= column.caption %>:</strong> <%= value %>
           <% end %>
         </td>
       <% end %>
-      <td>
-        <div class="wiki">
-          <%= textilizable(item.comment) %>
-        </div>
-      </td>
     <% end %>
-    <td class="buttons">
-    <% if User.current.admin? || User.current.allowed_to?(:update_issue_todo_list_items, @project) %>
-        <%= link_to image_tag('edit.png'),
+    <td>
+      <div class="wiki">
+        <%= textilizable(item.comment) %>
+      </div>
+    </td>
+    <% if can_update %>
+      <td class="buttons">
+        <%= link_to RedmineIssueTodoLists::Icon.call(self, 'edit', l(:issue_todo_label_edit_comment), icon_only: true),
                     edit_project_issue_todo_list_item_path(@project, @todo_list, item),
                     :remote => true,
-                    class: 'edit_item',
-                    :title => l(:issue_todo_label_edit_comment)
-        %>
+                    :class => 'icon-only icon-edit edit_item',
+                    :title => l(:issue_todo_label_edit_comment) %>
       </td>
     <% end %>
-    <% if User.current.admin? || User.current.allowed_to?(:remove_issue_todo_list_items, @project) %>
+    <% if can_remove %>
       <td class="buttons">
-        <%= link_to image_tag('link_break.png'),
+        <%= link_to RedmineIssueTodoLists::Icon.call(self, 'link-break', l(:issue_todo_lists_remove_item), icon_only: true),
                     project_issue_todo_list_item_path(@project, @todo_list, item),
                     :remote => true,
                     :method => :delete,
                     :data => {:confirm => l(:text_are_you_sure)},
-                    :title => l(:label_relation_delete)
-        %>
+                    :class => 'icon-only icon-link-break',
+                    :title => l(:issue_todo_lists_remove_item) %>
       </td>
     <% end %>
   </tr>
 <% end %>
-

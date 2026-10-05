@@ -13,7 +13,7 @@ zh:
   issue_todo_lists_add_issue: 添加任务
   issue_todo_lists_add_button_label: 添加
   issue_todo_lists_edit: 编辑待办事项列表设置
-  issue_todo_label_edit_comment: 编辑注释
+  issue_todo_label_edit_comment: 编辑评论
   issue_todo_label_order: 排序
   issue_todo_lists_edit_success: 待办事项列表更新成功
   issue_todo_lists_destroy_success: 列表删除成功
@@ -21,7 +21,17 @@ zh:
   issue_todo_lists_included_columns: 包括列
   issue_todo_lists_included_columns_for_issue_item: 包括任务项的列
   issue_todo_lists_included_columns_for_text_item: 包括文本项的列
-  issue_todo_lists_item_create_empty: 任务字段不能为空
+  issue_todo_lists_item_create_empty: 请输入任务或评论
   label_show_in_issue_sidebar: 在问题侧边栏中显示待办事项列表
   label_show_in_issue_edit: 创建或编辑问题时显示待办事项列表
   label_general_issue_todo_lists_settings: 问题待办事项列表的常规设置
+  issue_todo_lists_remove_item: "从待办事项列表中移除"
+  issue_todo_lists_add_to_list: "添加到待办事项列表"
+  issue_todo_lists_listed: "已在此待办事项列表中"
+  issue_todo_lists_order_error: "排序时出错，请重新加载页面。"
+  issue_todo_lists_closed_issue_not_allowed: "已关闭的任务不能添加到此待办事项列表"
+  issue_todo_lists_cm_add_item: "%{list}：添加任务"
+  issue_todo_lists_cm_unlist_item: "%{list}：移除任务"
+  issue_todo_lists_cm_add_all: "%{list}：添加所有任务"
+  issue_todo_lists_cm_unlist_all: "%{list}：移除所有任务"
+  issue_todo_lists_cm_add_some: "%{list}：添加 %{count} 个任务（共 %{total} 个）"

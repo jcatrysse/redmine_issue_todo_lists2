@@ -15,7 +15,7 @@
     <p><%= f.text_area :description, :rows => 8, :class => 'wiki-edit' %></p>
     <p><%= f.check_box :remove_closed_issues, :label => l(:issue_todo_lists_remove_closed_issues) %></p>
     <div>
-      <p><%= f.label l(:issue_todo_lists_included_columns) %></p>
+      <p><label><%= l(:issue_todo_lists_included_columns) %></label></p>
       <div id="issue_todo_lists_include_columns">
         <table class="list">
           <thead>
@@ -38,13 +38,13 @@
                           !@todo_list.included_columns.nil? && @todo_list.included_columns.count  > 0 ?
                               @todo_list.included_columns.include?(column.name.to_s) :
                               @issue_query.columns.include?(column) %>
-                    <%= f.check_box :included_columns, {multiple: true, label: '', checked: checked}, column.name, false %>
+                    <%= f.check_box :included_columns, {multiple: true, no_label: true, checked: checked, 'aria-label': "#{column.caption}: #{l(:issue_todo_lists_included_columns_for_issue_item)}"}, column.name, false %>
                   </td>
                   <td>
                     <%# Added Condition to check if @todo_list.included_fields exists%>
                     <%
                       checked = @todo_list.included_fields.include?(column.name.to_s) if !@todo_list.included_fields.nil?  %>
-                    <%= f.check_box :included_fields, {multiple: true, label: '', checked: checked}, column.name, false %>
+                    <%= f.check_box :included_fields, {multiple: true, no_label: true, checked: checked, 'aria-label': "#{column.caption}: #{l(:issue_todo_lists_included_columns_for_text_item)}"}, column.name, false %>
                   </td>
                 </tr>
             <% end %>
@@ -52,7 +52,7 @@
         </table>
       </div>
     </div>
-    <%= submit_tag params[:action] == 'edit' ? l(:button_save) : l(:button_create) %>
+    <%= submit_tag @todo_list.new_record? ? l(:button_create) : l(:button_save) %>
     <%= link_to l(:button_cancel), { action: 'index'}, data: { confirm: l(:text_are_you_sure) }, :onclick => "$('#issue_todo_list_description').removeData('changed')" %>
   <% end %>
 </div>

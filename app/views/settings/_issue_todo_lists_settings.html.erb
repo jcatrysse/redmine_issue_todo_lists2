@@ -1,13 +1,9 @@
-<%
-  def render_check_box(setting_key)
-    content_tag :p do
-      label_tag(setting_key, t("label_#{setting_key}")) +
-        check_box_tag("settings[#{setting_key}]", 1, @settings[setting_key])
-    end
-  end
-%>
 <fieldset class="box tabular settings">
   <legend><%= l(:label_general_issue_todo_lists_settings) %></legend>
-  <%= render_check_box('show_in_issue_sidebar') %>
-  <%= render_check_box('show_in_issue_edit') %>
+  <% %w(show_in_issue_sidebar show_in_issue_edit).each do |setting_key| %>
+    <p>
+      <%= label_tag "settings_#{setting_key}", l("label_#{setting_key}") %>
+      <%= check_box_tag "settings[#{setting_key}]", 1, RedmineIssueTodoLists::Settings.enabled?(setting_key, @settings) %>
+    </p>
+  <% end %>
 </fieldset>

@@ -37,11 +37,14 @@ fi
 
 # --delete so that a file removed from the plugin also disappears from the
 # checkout. The Redmine directory itself is excluded in case it sits inside the
-# plugin, and so is the plugin's own git metadata.
+# plugin, and so is the plugin's own git metadata. rsync matches excludes
+# relative to the plugin, so the checkout's path is made relative first.
 mkdir -p "$REDMINE_DIR/plugins/$PLUGIN_NAME"
-rsync -a --delete \
-  --exclude "/$REDMINE_DIR/" \
-  --exclude '/.git/' \
-  "$PLUGIN_ROOT/" "$REDMINE_DIR/plugins/$PLUGIN_NAME/"
+redmine_abs="$(cd "$REDMINE_DIR" && pwd)"
+excludes=(--exclude '/.git/')
+case "$redmine_abs" in
+  "$PLUGIN_ROOT"/*) excludes+=(--exclude "/${redmine_abs#"$PLUGIN_ROOT"/}/") ;;
+esac
+rsync -a --delete "${excludes[@]}" "$PLUGIN_ROOT/" "$REDMINE_DIR/plugins/$PLUGIN_NAME/"
 
 echo "Installed $PLUGIN_NAME into $REDMINE_DIR at $REDMINE_VERSION"

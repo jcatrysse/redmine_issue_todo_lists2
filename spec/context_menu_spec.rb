@@ -6,6 +6,10 @@ require_relative 'spec_helper'
 # view_issues_context_menu_end hook. Up to 2.2.2 the same partial also rendered
 # a "Dates" entry with a hidden modal and a script; that moved to
 # redmine_context_menu_actions in 2.3.0.
+#
+# The request specs read the whole menu, so they assume no other plugin that
+# adds to the context menu is installed in the test checkout. The partial specs
+# at the end check this plugin's output alone.
 RSpec.describe 'issues context menu' do
   let(:session) { new_session }
   let(:project) { Project.find(1) }
@@ -40,10 +44,16 @@ RSpec.describe 'issues context menu' do
     "/projects/#{todo_list.project.identifier}/issue_todo_lists/#{todo_list.id}/bulk_allocate_issues"
   end
 
-  # The hook output sits right before the closing </ul> of the menu. With no
-  # to-do lists it must add nothing, not even an empty <li>.
+  # The hook output sits right before the closing </ul> of the menu, after the
+  # core Delete entry (shown because back_url is the issue list). With no to-do
+  # lists it must add nothing: no element after Delete and no empty <li>.
   def ends_with_core_entry?(body)
-    body.match?(%r{</li>\s*</ul>\s*\z})
+    items = Nokogiri::HTML.fragment(body).at_css('ul').element_children
+    last = items.last
+
+    last.name == 'li' && !last.at_css('> a.icon-del').nil? &&
+      items.none? { |el| el.inner_html.strip.empty? } &&
+      body.match?(%r{</li>\s*</ul>\s*\z})
   end
 
   describe 'Dates entry, removed in 2.3.0' do
@@ -77,6 +87,7 @@ RSpec.describe 'issues context menu' do
     let!(:first_only) { create_todo_list('C first only') }
 
     before do
+      project.enable_module!(:issue_todo_lists)
       add_to_todo_list(both, issue1, issue2)
       add_to_todo_list(first_only, issue1)
       login(session, 'admin')
@@ -104,10 +115,17 @@ RSpec.describe 'issues context menu' do
       prefix = "#{project.name} - "
 
       expect(entries.map { |e| e[:title] }).to eq(["#{prefix}A both: unlist all items", "#{prefix}B none: add all items",
-                                                   "#{prefix}C first only: add 1 items from 2"])
+                                                   "#{prefix}C first only: add 1 of 2 items"])
       expect(entries.map { |e| e[:class] }).to eq(['icon icon-del', 'icon icon-add', 'icon icon-warning'])
       expect(entries.map { |e| e[:query]['list_count'] }).to eq(['-2', '2', '1'])
       entries.each { |entry| expect(entry[:query]['issue_ids']).to eq(['1', '2']) }
+    end
+
+    # Admins used to get the submenu even where the module is off.
+    it 'is not offered to an admin when the module is disabled' do
+      project.disable_module!(:issue_todo_lists)
+
+      expect(todo_list_entries(context_menu(issue1))).to be_nil
     end
 
     it 'is the last entry of the menu' do
@@ -127,12 +145,20 @@ RSpec.describe 'issues context menu' do
       login(session, 'jsmith')
     end
 
-    it 'shows the submenu with the permission and the module enabled' do
+    it 'shows the submenu with the permissions and the module enabled' do
       project.enable_module!(:issue_todo_lists)
-      role.add_permission!(:add_issue_todo_list_items_context_menu)
+      role.add_permission!(:add_issue_todo_list_items_context_menu, :view_issue_todo_lists)
 
       expect(todo_list_entries(context_menu(issue1)).map { |e| e[:text] }).to eq(['Sprint'])
       expect(todo_list_entries(context_menu(issue1, issue2)).map { |e| e[:text] }).to eq(['Sprint'])
+    end
+
+    it 'shows no submenu to a member who may not view the lists' do
+      project.enable_module!(:issue_todo_lists)
+      role.add_permission!(:add_issue_todo_list_items_context_menu)
+      role.remove_permission!(:view_issue_todo_lists)
+
+      expect(todo_list_entries(context_menu(issue1))).to be_nil
     end
 
     it 'shows no submenu without the permission' do
@@ -154,6 +180,51 @@ RSpec.describe 'issues context menu' do
     end
   end
 
+  # Core draws the folder arrow with a span from Redmine 6 on and through CSS on
+  # 5.1, where a span.icon-only is a 16px inline-block that adds a blank line
+  # under the entry. So the to-do lists folder is built the way core builds its
+  # own, also when another plugin defines a sprite_icon on 5.1.
+  describe 'folder markup' do
+    before do
+      project.enable_module!(:issue_todo_lists)
+      create_todo_list('Sprint')
+      login(session, 'admin')
+    end
+
+    def folder_children(body, label)
+      folder = Nokogiri::HTML.fragment(body).css('li.folder').find do |li|
+        li.at_css('> a.submenu')&.text&.strip == label
+      end
+      expect(folder).not_to be_nil, "no #{label} folder in the menu"
+      folder.element_children.map { |el| [el.name, el['class']] }
+    end
+
+    def expect_built_like_core(body)
+      core = folder_children(body, I18n.t(:field_tracker))
+      expect(folder_children(body, I18n.t(:issue_todo_lists_title))).to eq(core)
+    end
+
+    # Stands in for a plugin's sprite_icon on 5.1, also over one that another
+    # plugin in the checkout already defines.
+    def with_sprite_icon_from_another_plugin
+      own = ApplicationHelper.instance_method(:sprite_icon) if ApplicationHelper.method_defined?(:sprite_icon, false)
+      ApplicationHelper.send(:define_method, :sprite_icon) { |_name, label = nil, **_options| label.to_s }
+      yield
+    ensure
+      ApplicationHelper.send(:remove_method, :sprite_icon)
+      ApplicationHelper.send(:define_method, :sprite_icon, own) if own
+    end
+
+    it 'matches the core folders' do
+      expect_built_like_core(context_menu(issue1))
+    end
+
+    it 'matches the core folders when another plugin defines sprite_icon' do
+      skip "sprite_icon is core's from 6.0 on" if RedmineIssueTodoLists::Icon.sprites?
+      with_sprite_icon_from_another_plugin { expect_built_like_core(context_menu(issue1, issue2)) }
+    end
+  end
+
   describe 'without any to-do list' do
     before { login(session, 'admin') }
 
@@ -170,6 +241,27 @@ RSpec.describe 'issues context menu' do
 
       expect(todo_list_entries(body)).to be_nil
       expect(ends_with_core_entry?(body)).to be(true)
+    end
+  end
+
+  describe 'the partial on its own' do
+    def render_partial(todo_lists, assigns = {})
+      ApplicationController.render(:partial => 'context_menus/issue_todo_lists/issues_context_menu',
+                                   :locals => {:todo_lists => todo_lists, :listed_issue_ids => {}}, :assigns => assigns)
+    end
+
+    it 'renders nothing at all without to-do lists' do
+      expect(render_partial([])).to eq('')
+    end
+
+    it 'renders the to-do lists folder and nothing else' do
+      todo_list = create_todo_list('Sprint')
+      html = render_partial([todo_list], :issue => issue1, :issue_ids => [1], :back => '/issues')
+      items = Nokogiri::HTML.fragment(html).element_children
+
+      expect(items.map { |el| [el.name, el['class']] }).to eq([['li', 'folder']])
+      expect(items.first.css('> ul > li > a').map { |a| a.text.strip }).to eq(['Sprint'])
+      expect(html).not_to match(/Dates|update-dates-modal|data-disables|<script/)
     end
   end
 end
