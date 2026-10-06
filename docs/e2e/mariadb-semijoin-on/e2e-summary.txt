@@ -1,0 +1,18 @@
+smoke: 16 screenshot(s), 0 problem(s)
+core: 6 screenshot(s), 0 problem(s)
+[2m  - waiting for locator('tr#issue-4 td.status')[22m
+  name: 'TimeoutError'
+csv_api: 1 screenshot(s), 1 problem(s)
+  FAIL api show: issue or text item missing
+issue_form: 6 screenshot(s), 0 problem(s)
+issue_query: 5 screenshot(s), 0 problem(s)
+issue_sidebar: 6 screenshot(s), 0 problem(s)
+items: 9 screenshot(s), 0 problem(s)
+lists: 12 screenshot(s), 0 problem(s)
+ordering: 4 screenshot(s), 2 problem(s)
+  FAIL viewer: the rows moved
+  FAIL viewer POST changed the order
+remove_closed: 6 screenshot(s), 0 problem(s)
+settings: 6 screenshot(s), 0 problem(s)
+user_delete: 4 screenshot(s), 0 problem(s)
+webhooks: 3 screenshot(s), 0 problem(s)
