@@ -1,16 +1,16 @@
 # lists
 
-Run 2026-10-06T19:30:17.200Z against http://127.0.0.1:3000.
+Run 2026-10-06T19:50:31.413Z against http://127.0.0.1:3000.
 
 | screenshot | user | URL | shows |
 |---|---|---|---|
 | ![](lists-index.png) | manager | `/projects/e2e-project/issue_todo_lists` | The project menu entry leads to the index of the project's lists, with the New link |
 | ![](lists-create-blank-title.png) | manager | `/projects/e2e-project/issue_todo_lists` | A blank title is refused with a validation error, the form stays |
 | ![](lists-create-form.png) | manager | `/projects/e2e-project/issue_todo_lists` | The form with title, description, remove closed issues and the column choice |
-| ![](lists-created.png) | manager | `/projects/e2e-project/issue_todo_lists/4` | The new list is shown with its formatted description and a notice |
-| ![](lists-edited.png) | manager | `/projects/e2e-project/issue_todo_lists/4` | Editing the list stores the new title |
+| ![](lists-created.png) | manager | `/projects/e2e-project/issue_todo_lists/5` | The new list is shown with its formatted description and a notice |
+| ![](lists-edited.png) | manager | `/projects/e2e-project/issue_todo_lists/5` | Editing the list stores the new title |
 | ![](lists-index-viewer.png) | viewer | `/projects/e2e-project/issue_todo_lists` | A member who may only view lists sees the index without the New link |
-| ![](lists-show-viewer.png) | viewer | `/projects/e2e-project/issue_todo_lists/4` | The same member sees the list without edit, delete, add or ordering tools |
+| ![](lists-show-viewer.png) | viewer | `/projects/e2e-project/issue_todo_lists/5` | The same member sees the list without edit, delete, add or ordering tools |
 | ![](lists-new-viewer-refused.png) | viewer | `/projects/e2e-project/issue_todo_lists/new` | Creating a list without the permission is refused (403) |
 | ![](lists-index-reporter-refused.png) | reporter | `/projects/e2e-project/issue_todo_lists` | A member without the plugin's permissions has no menu entry and is refused (403) |
 | ![](lists-private-outsider-refused.png) | outsider | `/projects/e2e-private/issue_todo_lists` | The lists of a private project are refused to a non-member (403) |

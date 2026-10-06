@@ -39,8 +39,8 @@ await t.shot('dragged', 'The last item is dragged to the top; the order numbers 
 await t.go(listPath);
 if ((await ids()).join() !== expected.join()) t.problems.push('reload: the new order was not stored');
 const order = await t.page.locator('#issue-todo-list-table td.issue-todo-list-item-order').allInnerTexts();
-if (order.map(s => s.trim()).join(',') !== '1,2,3') t.problems.push(`reload: order numbers ${order}`);
-await t.shot('reloaded', 'After a reload the new order is still there, numbered 1 to 3');
+if (order.map(s => s.trim()).join(',') !== order.map((_, i) => i + 1).join(',')) t.problems.push(`reload: order numbers ${order}`);
+await t.shot('reloaded', 'After a reload the new order is still there, numbered from 1 without gaps');
 
 // Put the seed order back, so the run can be repeated.
 const token = await t.page.locator('meta[name=csrf-token]').getAttribute('content');

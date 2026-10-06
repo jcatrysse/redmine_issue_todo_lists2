@@ -1,0 +1,19 @@
+GET /projects/e2e-project/issue_todo_lists/1.csv as manager -> HTTP 200, text/csv; header=present
+[BOM]Order,#,Project,Tracker,Status,Priority,Subject,Assignee,Updated,Comment
+1,2,E2E project,Feature,New,Normal,E2E unassigned issue,"",10/06/2026 07:47 PM,
+2,,,,,,,,,Text item: order the coffee
+3,1,E2E project,Bug,New,Normal,E2E assigned issue,Manager E2E,10/06/2026 07:47 PM,
+
+GET /projects/e2e-project/issue_todo_lists/1.csv as reporter -> HTTP 403
+GET /projects/e2e-project/issue_todo_lists.json with the API key of manager -> HTTP 200
+  2 lists: E2E sprint, E2E cleanup
+GET /projects/e2e-project/issue_todo_lists/1.json with the API key of viewer -> HTTP 200
+  3 items: #2 E2E unassigned issue; text "Text item: order the coffee"; #1 E2E assigned issue
+GET /projects/e2e-project/issue_todo_lists/1.xml with the API key of manager -> HTTP 200
+  XML starts: <?xml version="1.0" encoding="UTF-8"?><todo_list_items type="array"><todo_list_items><id>2</id><position>1</position><is
+GET /projects/e2e-project/issue_todo_lists.json with the API key of reporter -> HTTP 403
+GET /projects/e2e-private/issue_todo_lists.json with the API key of outsider -> HTTP 403
+GET /projects/e2e-private/issue_todo_lists.json with the API key of manager -> HTTP 200
+GET /projects/e2e-private/issue_todo_lists.json without a key -> HTTP 401
+GET /projects/e2e-project/issue_todo_lists.json with the API key of bogus -> HTTP 401
+POST /projects/e2e-project/issue_todo_lists.json with the API key of manager -> HTTP 403
