@@ -109,6 +109,12 @@ items through `Issue.visible`). `docs/e2e/mariadb-semijoin-on/repro.sql` is core
 of 6; with `SET optimizer_switch='semijoin=off'` (or `materialization=off`) it gives 6, and the whole e2e set is
 green. Plugin specs do not hit it (fixtures differ). See "After the upgrade".
 
+**Review.** Own adversarial review of the whole branch diff: no plugin code changed; the scenarios
+restore what they change where a rerun depends on it (seed order, settings, the webhook), `node --check` passes
+on every script, shellcheck on `start_server.sh` shows only the existing SC1091 info. OpenAI review
+(`gpt-5`, `9e1550ed2d..315c1fe`): "No findings." (`docs/reviews/openai-2026-10-06-315c1fe.md`).
+Left for later: `webhooks.mjs` leaves the core setting "webhooks enabled" on in the e2e database.
+
 ## Inventory of functions
 
 Scenario scripts in `test/e2e/`, screenshots in `docs/e2e/<scenario>-*.png` with a caption table in
