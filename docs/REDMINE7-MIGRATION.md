@@ -18,16 +18,21 @@ what is left. Written 2026-10-06 from a measured analysis (report at the bottom)
 | Plugin id | `redmine_issue_todo_lists2` |
 | GEOxyz runs today | `master` |
 | Upstream | geen |
-| Runs on Redmine 7 as is | JA |
+| Runs on Redmine 7 as is | JA (confirmed end to end in a browser, see "Results") |
 | Upstream sync | GEEN UPSTREAM |
 | After sync | n.v.t. |
 | Complexity (1 trivial .. 5 rewrite) | 1 |
-| Measured on | Redmine 7.0.1 (7.0-stable-GEOxyz + latest 7.0-stable), Rails 8.1.3.1, Ruby 3.3.6, PostgreSQL 16 and MariaDB 10.11 |
-| Branch head when this file was written | `3f12767` |
+| Measured on | Redmine 7.0.1 (7.0-stable-GEOxyz @ `8067e23`), Rails 8.1.3.1, Ruby 3.3.6, PostgreSQL 16.15 and MariaDB 10.11.14 |
+| Migration session | 2026-10-06, done: no plugin code change needed; tests, e2e and review below |
 
 ## Already on this branch
 
-- nothing: the branch equals the branch GEOxyz runs today.
+- `test/e2e/`: seed and 12 end-to-end scenarios, one per function (inventory below).
+- `docs/e2e/`: screenshots and tables of the clean PostgreSQL run; `docs/e2e/mariadb/` the MariaDB run;
+  `docs/e2e/mariadb-semijoin-on/` the evidence of the MariaDB optimizer bug (see "After the upgrade").
+- `.codex/start_server.sh`: grants the e2e database to the MariaDB account `test_setup.sh` creates
+  (it was refused with "Access denied for 'redmine'@'127.0.0.1'").
+- No change to the plugin's own code (`app/`, `lib/`, `config/`, `db/`, `assets/`, `init.rb`).
 
 ## Work list for the migration session
 
@@ -36,13 +41,116 @@ In this order: things that break, security, the GEOxyz changes, the open items, 
 **Open items from the analysis** (Dutch; where they conflict with a decision or a priority item above, those win)
 
 1. lijstpagina (drag-sortering) en toevoegen via context-menu met de hand testen op 7.0; smoke bereikte alleen de index-pagina's
+   **DONE.** `test/e2e/ordering.mjs` sleept met de muis (jQuery UI sortable), de volgorde blijft na herladen;
+   `test/e2e/context_menu.mjs` voegt toe en haalt weg voor 1 en 2 issues (ook de gedeeltelijke variant).
+   Beide groen op PostgreSQL en MariaDB, met en zonder rechten.
 2. todolists_with_positions in Liquid hangt alleen aan RedmineCrm::Liquid::IssueDrop; zonder redmineup (reporter_dashboards standalone) niet bereikbaar in sjablonen
+   **Bevestigd, niet veranderd; keuze voor Jan (zie "Open questions for Jan").** Gemeten met
+   `redmine_reporter_dashboards@redmine70-migration` (`a167c70`) erbij: `TodoListsDrop` geladen, `RedmineCrm=nil`,
+   `RedmineReporterDashboards::Liquid::Drops::IssueDrop.method_defined?(:todolists_with_positions)` = `false`.
+   reporter_dashboards houdt zijn sjabloonwoordenschat bewust zelf bij (zijn eigen werklijst-item 7).
+   Deze plugin biedt `Issue#todolists_with_positions(user)` (respecteert de rechten van `user`,
+   spec `models_spec.rb:116`), dus reporter_dashboards kan het zelf aanbieden met zijn eigen actor.
 
 **Checks**
 
 3. Run the plugin's whole test suite on Redmine 7.0-stable-GEOxyz with PostgreSQL AND MariaDB, and once on 5.1-stable if the branch is meant to stay 5.1-compatible.
+   **DONE** on 7.0 (numbers under "Results"). 5.1: **not run**: this branch changes no plugin code, so
+   master's 5.1 support (README, 2.4.0) is unaffected; Redmine 5.1 also needs Ruby < 3.3 and only 3.3.6 is
+   in this container.
 4. Check Redmine 7 webhooks against this plugin (see "Rules"), and note the result here even if nothing is needed.
+   **DONE, nothing needed.** Core renders `app/views/issues/show.api.rsb` from `Rails.root` for the payload; this
+   plugin adds nothing to the issue API and changes no issue data (list membership is its own table), so
+   webhooks and the REST API agree. `test/e2e/webhooks.mjs` points a real webhook at a listener: the issue
+   form putting an issue on a list sends `issue.updated`, closing it (which takes it off a list that removes
+   closed issues) sends `issue.closed` and `issue.updated`; no to-do list fields in the payload
+   (`docs/e2e/webhooks-payloads.json`). Changing a list (items, order) sends no webhook, as there is no
+   webhook event for plugin objects.
 5. Verify every feature of the plugin by hand on a running Redmine 7 (screenshots).
+   **DONE**: inventory below, every screenshot looked at.
+
+**Found while testing (pre-existing, not Redmine 7 related, not fixed: rule "do not fix in passing")**
+
+6. A text item's field is only shown when the same column is also chosen for issue items: choosing
+   "Due date" for text items alone stores the value but shows it nowhere (list, CSV), only in the API.
+   The scenario `items.mjs` therefore also ticks the issue column.
+7. Text item dates are shown raw (`2026-12-24`), not in the user's date format like issue dates.
+8. "Add issue" with an unknown number says "The issue was not found or does not belong to this project",
+   while issues of other projects are accepted (cross-project lists).
+9. The settings page says "todo lists" (`label_show_in_issue_sidebar` etc.) where the rest says "To-do lists".
+10. `GET .../items/:id/edit` answers only JS; a direct HTML request gives 406 with an empty page
+    (smoke screenshot 12). Correct, not a server error; listed so nobody reads the blank picture as a bug.
+
+## Results
+
+**Baseline, before any change** (branch head `808d8af`, same as master `fd8fb75` for the code):
+
+| | PostgreSQL 16.15 | MariaDB 10.11.14 |
+|---|---|---|
+| `./.codex/test_plugin.sh` | 140 examples, 0 failures, 1 pending | 140 examples, 0 failures, 2 pending |
+| migrations down to 0 and up (test) | OK | OK |
+| `./.codex/e2e.sh` (smoke + core, no scenarios yet) | smoke 16 pages, core 6 shots, 0 problems | not run before the scenarios existed |
+
+Pending: `context_menu_spec.rb:222` (only meaningful on 5.1), and on MariaDB also `migrations_spec.rb:18`
+(PostgreSQL only by design).
+
+**Final** (plugin code unchanged, so the spec numbers are the same):
+
+| | PostgreSQL 16.15 | MariaDB 10.11.14 |
+|---|---|---|
+| specs | 140 / 0 failures / 1 pending | 140 / 0 failures / 2 pending |
+| e2e, `start_server.sh --reset` then `e2e.sh` | 14 scripts, 92 screenshots, 0 problems (`docs/e2e/`) | default optimizer: 11 of 14 green, 3 fail on a MariaDB bug (below); with `semijoin=off`: 14 scripts, 92 screenshots, 0 problems (`docs/e2e/mariadb/`) |
+| together with `redmine_reporter_dashboards@redmine70-migration` | migrations, eager load OK; specs 140/0/1; e2e 14 scripts, 0 problems | not run |
+
+**MariaDB 10.11.14 optimizer bug (not this plugin).** With the default `optimizer_switch`, core's issue
+query returns no rows for a member of a public project whose role sees all issues (`viewer` in the seed):
+an empty issue list in core, and lists that show only their text items to that user (the plugin filters
+items through `Issue.visible`). `docs/e2e/mariadb-semijoin-on/repro.sql` is core SQL only and gives 0 instead
+of 6; with `SET optimizer_switch='semijoin=off'` (or `materialization=off`) it gives 6, and the whole e2e set is
+green. Plugin specs do not hit it (fixtures differ). See "After the upgrade".
+
+## Inventory of functions
+
+Scenario scripts in `test/e2e/`, screenshots in `docs/e2e/<scenario>-*.png` with a caption table in
+`docs/e2e/<scenario>.md`. Users: admin, manager (every permission), viewer (seed: may only view lists),
+reporter (no plugin permission), outsider (no membership), anonymous.
+
+| function | how a user reaches it | scenario | screenshots (paths covered) |
+|---|---|---|---|
+| Project menu, index of lists | project menu "To-do lists" | `lists.mjs` | index, index-viewer (no New), index-reporter-refused (403, no menu), private-outsider-refused (403), private-anonymous-login |
+| Create, edit, delete a list | New / Edit / Delete on the list | `lists.mjs` | create-blank-title (refused), create-form, created, edited, deleted, new-viewer-refused (403), show-viewer (no tools) |
+| Add items (issue by number, with #, text item) | "Add issue" form on the list | `items.mjs` | added, unknown-issue-refused, empty-item-refused, closed-issue-refused, viewer (no form; POST 403) |
+| Edit comment and text item fields | pencil on an item | `items.mjs` | edit-comment-form, edit-text-item-form, edited |
+| Remove an item | broken-link icon on an item | `items.mjs` | removed (order stays 1..n) |
+| Order by drag and drop | drag a row | `ordering.mjs` | before, dragged, reloaded, viewer-not-sortable (POST 403) |
+| Issue context menu folder | right click in the issue list | `context_menu.mjs` | single-add, single-added, single-unlist, bulk-partial, bulk-added, bulk-unlist, viewer-no-folder, reporter-no-folder |
+| Issue sidebar block | issue page | `issue_sidebar.mjs` | manager, added, removed, viewer (check mark only), reporter (no block), closed-issue (no add) |
+| Issue form field (new and edit) | issue form | `issue_form.mjs` | new-form, new-listed, edit-form, edited, invalid-kept (validation error keeps choice, changes nothing), reporter-no-field |
+| Remove closed issues | list option; closing an issue | `remove_closed.mjs` | before-close, closed, cleanup-after, sprint-after, option-off, option-on |
+| Issue query filter and columns, sort | issue list filters/options | `issue_query.mjs` | filter-form, filtered, filter-none, sorted, reporter (no filter/columns even by URL) |
+| CSV export | "Also available in: CSV" | `csv_api.mjs` | csv-link; content and reporter 403 in `csv_api-results.txt` |
+| REST API index/show (JSON, XML) | API key | `csv_api.mjs` | `csv_api-results.txt`: 200 for manager/viewer, 403 reporter/outsider, 401 no key/bad key, POST refused |
+| Plugin settings (sidebar, issue form) | Administration > Plugins > Configure | `settings.mjs` | page, off, issue-off, edit-off, edit-on, manager-refused (403) |
+| User deletion hands lists to Anonymous | Administration > Users > Delete | `user_delete.mjs` | created-by-leaver, confirm-delete, deleted, list-after |
+| Webhooks (Redmine 7) | My account > Webhooks | `webhooks.mjs` | new-webhook, payloads, webhook-deleted; `webhooks-payloads.json` |
+| Every plugin page renders (smoke), core issue flows | | `.codex/e2e/smoke.mjs`, `core.mjs` | smoke-01..16, core-* |
+| Liquid drop `todolists_with_positions` | report templates via redmineup | runner check (item 2) | none: no template engine with this drop on 7.0 without redmineup |
+| Migrations (10), rollback | rake | `redmine:plugins:migrate VERSION=0` and up | PostgreSQL and MariaDB OK |
+
+No mail, rake tasks or cron jobs in this plugin.
+
+## Open questions for Jan
+
+1. **Liquid `todolists_with_positions` without redmineup** (item 2). Options: (a) leave this plugin as is and let
+   reporter_dashboards decide whether its IssueDrop offers to-do lists, calling
+   `issue.todolists_with_positions(actor)`; (b) let this plugin patch `RedmineReporterDashboards::Liquid::Drops::IssueDrop`
+   when it is loaded. Built: (a), nothing changed. Recommendation: (a). reporter_dashboards treats every public
+   drop method as template vocabulary and decides it there; a patch from here would bypass that and use
+   `User.current` instead of its report actor. First check whether any GEOxyz template uses
+   `todolists_with_positions` at all (reporter_dashboards' plan, open item 5).
+2. **MariaDB optimizer bug** (Results). Not a plugin choice, but it hits production if it runs this MariaDB
+   version: who checks the production version and decides between upgrading MariaDB and setting
+   `optimizer_switch='semijoin=off'`? Recommendation: run `repro.sql` against a copy of production first.
 
 ## GEOxyz changes to review or re-apply
 
@@ -52,7 +160,13 @@ Own plugin: all of it is GEOxyz code, so there is nothing to re-apply. While mig
 
 Actions the person doing the upgrade must take, or know about, for this plugin:
 
-- None known. Add here what the session finds.
+- Run the plugin migrations as usual (`redmine:plugins:migrate`); nothing new since 2.4.0.
+- On MariaDB: check the server version. On 10.11.14 (tested here) core's issue list and this plugin's
+  lists hide issues from members of public projects whose role sees all issues. Run
+  `docs/e2e/mariadb-semijoin-on/repro.sql` (adapted to a real project, member and role) or simply log in
+  as such a member; if issues are missing, set `optimizer_switch='semijoin=off'` in the server config or
+  upgrade MariaDB. Not a plugin issue, but users will report it as one.
+- Webhooks need no action for this plugin.
 
 ## How to test
 
