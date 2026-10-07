@@ -45,7 +45,7 @@ In this order: things that break, security, the GEOxyz changes, the open items, 
    `test/e2e/context_menu.mjs` voegt toe en haalt weg voor 1 en 2 issues (ook de gedeeltelijke variant).
    Beide groen op PostgreSQL en MariaDB, met en zonder rechten.
 2. todolists_with_positions in Liquid hangt alleen aan RedmineCrm::Liquid::IssueDrop; zonder redmineup (reporter_dashboards standalone) niet bereikbaar in sjablonen
-   **Bevestigd, niet veranderd; keuze voor Jan (zie "Open questions for Jan").** Gemeten met
+   **Bevestigd, niet veranderd; beslist 2026-10-07: optie (a), zie "Decided by Jan".** Gemeten met
    `redmine_reporter_dashboards@redmine70-migration` (`a167c70`) erbij: `TodoListsDrop` geladen, `RedmineCrm=nil`,
    `RedmineReporterDashboards::Liquid::Drops::IssueDrop.method_defined?(:todolists_with_positions)` = `false`.
    reporter_dashboards houdt zijn sjabloonwoordenschat bewust zelf bij (zijn eigen werklijst-item 7).
@@ -55,9 +55,8 @@ In this order: things that break, security, the GEOxyz changes, the open items, 
 **Checks**
 
 3. Run the plugin's whole test suite on Redmine 7.0-stable-GEOxyz with PostgreSQL AND MariaDB, and once on 5.1-stable if the branch is meant to stay 5.1-compatible.
-   **DONE** on 7.0 (numbers under "Results"). 5.1: **not run**: this branch changes no plugin code, so
-   master's 5.1 support (README, 2.4.0) is unaffected; Redmine 5.1 also needs Ruby < 3.3 and only 3.3.6 is
-   in this container.
+   **DONE** on 7.0 (numbers under "Results"). 5.1: not needed, GEOxyz drops 5.1 (decided 2026-10-07);
+   MariaDB runs were done before that decision and are kept as a note.
 4. Check Redmine 7 webhooks against this plugin (see "Rules"), and note the result here even if nothing is needed.
    **DONE, nothing needed.** Core renders `app/views/issues/show.api.rsb` from `Rails.root` for the payload; this
    plugin adds nothing to the issue API and changes no issue data (list membership is its own table), so
@@ -145,18 +144,33 @@ reporter (no plugin permission), outsider (no membership), anonymous.
 
 No mail, rake tasks or cron jobs in this plugin.
 
-## Open questions for Jan
+## Decided by Jan (2026-10-07)
 
-1. **Liquid `todolists_with_positions` without redmineup** (item 2). Options: (a) leave this plugin as is and let
-   reporter_dashboards decide whether its IssueDrop offers to-do lists, calling
-   `issue.todolists_with_positions(actor)`; (b) let this plugin patch `RedmineReporterDashboards::Liquid::Drops::IssueDrop`
-   when it is loaded. Built: (a), nothing changed. Recommendation: (a). reporter_dashboards treats every public
-   drop method as template vocabulary and decides it there; a patch from here would bypass that and use
-   `User.current` instead of its report actor. First check whether any GEOxyz template uses
-   `todolists_with_positions` at all (reporter_dashboards' plan, open item 5).
-2. **MariaDB optimizer bug** (Results). Not a plugin choice, but it hits production if it runs this MariaDB
-   version: who checks the production version and decides between upgrading MariaDB and setting
-   `optimizer_switch='semijoin=off'`? Recommendation: run `repro.sql` against a copy of production first.
+Recorded from `docs/DECISIONS-2026-10-07.md` (Jan's answers in the coordinating session). Final.
+
+**General, for every GEOxyz plugin**
+- GEOxyz goes straight to Redmine 7: no backports to 5.1, nothing cherry-picked to `master`;
+  `redmine70-migration` goes live with Redmine 7. Redmine 5.1 compatibility is no longer a requirement;
+  no new code paths that exist only for 5.1. (The 5.1 paths already in 2.4.0, such as the
+  `Rails.gem_version` guard on `serialize` and `RedmineIssueTodoLists::Icon` for 5.1, stay as they are:
+  removing them is not asked and would be a drive-by refactoring.)
+- GEOxyz runs PostgreSQL 16 only, no MariaDB or MySQL. Tests and e2e on PostgreSQL only; SQL stays
+  portable where that costs nothing; a MariaDB-only problem is a note, not a blocker.
+- deface without a version constraint: not applicable, this plugin does not use deface.
+- A core method that other plugins also patch is patched with `prepend`, never `alias_method`:
+  **applies here** (`IssueQuery#initialize_available_filters`, `#available_columns`,
+  `#joins_for_order_statement`, `QueriesHelper#column_content`). Built, see work list item 11.
+- GitHub Actions manual only: this repo has no workflows; nothing to do.
+
+**For this plugin**
+1. **MariaDB optimizer bug** (was open question 2). No option chosen; Jan's note: "we gebruiken geen
+   mariadb". GEOxyz does not run MariaDB, so nothing to do. The finding and its reproduction stay in
+   "Results" and `docs/e2e/mariadb-semijoin-on/` as a note.
+2. **Liquid `todolists_with_positions` without redmineup** (was open question 1). Not in Jan's decision
+   list. On 2026-10-07 Jan asked in this session for a prompt to add the field to
+   redmine_reporter_dashboards, which is option (a): this plugin stays as is, reporter_dashboards adds it
+   in its own drop layer with `issue.todolists_with_positions(actor)`. Recorded as (a); the work belongs
+   to that repository.
 
 ## GEOxyz changes to review or re-apply
 
@@ -167,11 +181,7 @@ Own plugin: all of it is GEOxyz code, so there is nothing to re-apply. While mig
 Actions the person doing the upgrade must take, or know about, for this plugin:
 
 - Run the plugin migrations as usual (`redmine:plugins:migrate`); nothing new since 2.4.0.
-- On MariaDB: check the server version. On 10.11.14 (tested here) core's issue list and this plugin's
-  lists hide issues from members of public projects whose role sees all issues. Run
-  `docs/e2e/mariadb-semijoin-on/repro.sql` (adapted to a real project, member and role) or simply log in
-  as such a member; if issues are missing, set `optimizer_switch='semijoin=off'` in the server config or
-  upgrade MariaDB. Not a plugin issue, but users will report it as one.
+- MariaDB optimizer bug: no action, GEOxyz runs PostgreSQL (decided 2026-10-07).
 - Webhooks need no action for this plugin.
 
 ## How to test
@@ -200,7 +210,7 @@ results quoted in the analysis come from it.
 1. **Start**: `git fetch && git checkout redmine70-migration && git pull`. Read this whole file,
    including the analysis report at the bottom. Do not reopen decisions recorded here.
 2. **Baseline, before you change anything**:
-   - the plugin's tests on Redmine 7.0-stable-GEOxyz with PostgreSQL and with MariaDB;
+   - the plugin's tests on Redmine 7.0-stable-GEOxyz with PostgreSQL;
    - a real running Redmine with this plugin (`./.codex/start_server.sh`) and the browser run
      (`./.codex/e2e.sh`: smoke over every page the plugin adds, plus the core issue flows).
    Write the numbers here. Something already broken now is a finding, not your regression.
@@ -212,9 +222,8 @@ results quoted in the analysis come from it.
 4. **GEOxyz changes**: go through the table above, one item at a time. Each kept or re-made change
    is its own commit with a test that proves it. Record the verdict in the table.
 5. **Work list**: then the numbered list, in order. One concern per commit.
-6. **Portability**: everything must run on Redmine's supported databases (PostgreSQL,
-   MySQL/MariaDB; SQLite where the plugin already supports it). Migrations must be reversible and
-   are run down and up on PostgreSQL and MariaDB.
+6. **Portability**: PostgreSQL is what GEOxyz runs and what is tested (decided 2026-10-07); keep SQL
+   portable where that costs nothing. Migrations must be reversible and are run down and up on PostgreSQL.
 7. **Together**: run with the other GEOxyz plugins installed (the migration kit's harness, or
    `RMP_EXTRA_PLUGINS`). A failure that only appears in combination is a finding to record here.
 8. **End to end, visually, every function**: on the real Redmine from `start_server.sh`
@@ -233,7 +242,6 @@ results quoted in the analysis come from it.
      reads them; API through `t.page.request`) and record command and result.
    - Before pictures where behaviour or layout changes: the branch GEOxyz runs today, on
      Redmine 5.1, same scenarios, `RMP_E2E_OUT=docs/e2e/before`.
-   - Run the whole e2e set once on MariaDB as well (`RMP_DB=mariadb`, then `start_server.sh --reset`).
 9. **Independent review**: first your own, adversarial: re-read the whole diff as if someone
    else wrote it and you are paid to reject it. Then, **when `OPENAI_API_KEY` is set in the
    session**, `./.codex/openai_review.sh`: it sends the diff of this branch to an OpenAI model
@@ -278,8 +286,12 @@ results quoted in the analysis come from it.
   (on by default: `t.sudo()` in a scenario). The breaker list is in the migration kit's CHECKLIST.md.
 - **Locales**: keep the locales the plugin ships in sync; translate a new key by matching the
   closest existing key in the same file, not from scratch; do not add new languages.
-- **5.1 compatibility**: prefer fixes that also run on Redmine 5.1 so they can be merged early;
-  say so when a fix cannot.
+- **No 5.1** (Jan, 2026-10-07): GEOxyz goes straight to Redmine 7; no backports, no new code paths that
+  exist only for Redmine 5.1.
+- **PostgreSQL only** (Jan, 2026-10-07): tests and e2e on PostgreSQL 16; keep SQL portable where that
+  costs nothing; a MariaDB-only problem is a note, not a blocker.
+- **Patching core**: a core method that other plugins also patch is patched with `prepend`, never with
+  `alias_method` (Jan, 2026-10-07).
 - **Git**: work on `redmine70-migration` only; never push to the default branch; never force-push
   a branch someone else uses. Descriptive commit messages (what and why). Push after every
   commit, together with the updated status in this file: a cloud session can stop at a usage
@@ -290,7 +302,7 @@ results quoted in the analysis come from it.
 ## Definition of done
 
 - All items of the work list are done or explicitly deferred with a reason, in this file.
-- The plugin's tests are green on Redmine 7.0-stable-GEOxyz with PostgreSQL and MariaDB
+- The plugin's tests are green on Redmine 7.0-stable-GEOxyz with PostgreSQL
   (numbers in this file); boot, production-like eager load, migrations up/down OK.
 - Every function in the inventory exercised end to end on a real running Redmine, with and
   without permissions and on its failure paths; `./.codex/e2e.sh` green; screenshots looked at,
