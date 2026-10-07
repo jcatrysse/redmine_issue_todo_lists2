@@ -1,8 +1,8 @@
 GET /projects/e2e-project/issue_todo_lists/1.csv as manager -> HTTP 200, text/csv; header=present
 [BOM]Order,#,Project,Tracker,Status,Priority,Subject,Assignee,Updated,Comment
-1,2,E2E project,Feature,New,Normal,E2E unassigned issue,"",10/06/2026 07:47 PM,
+1,2,E2E project,Feature,New,Normal,E2E unassigned issue,"",10/07/2026 04:17 PM,
 2,,,,,,,,,Text item: order the coffee
-3,1,E2E project,Bug,New,Normal,E2E assigned issue,Manager E2E,10/06/2026 07:47 PM,
+3,1,E2E project,Bug,New,Normal,E2E assigned issue,Manager E2E,10/07/2026 04:17 PM,
 
 GET /projects/e2e-project/issue_todo_lists/1.csv as reporter -> HTTP 403
 GET /projects/e2e-project/issue_todo_lists.json with the API key of manager -> HTTP 200
