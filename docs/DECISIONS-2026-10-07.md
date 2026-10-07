@@ -30,3 +30,11 @@ What to do:
 7. Update Status, the inventory, the work list and "After the upgrade". Push `redmine70-migration` after every commit.
 8. These decisions are final; do not stop to ask about them. If one turns out to be impossible, write down why in the plan and carry on with the rest.
 9. End with a short report in Dutch: per decision what you did (commit), test numbers, e2e numbers (scenarios, screenshots, problems), the review result, what is left for Jan.
+
+## Round 2, decided by Jan on 2026-10-07 (evening)
+
+Jan answered these follow-up questions from the migration report the same way, one at a time, in the coordinating session.
+
+- redmine_issue_todo_lists2-n2-1 (todo_lists 2): De to-do's van een issue waren in rapportsjablonen alleen bruikbaar via RedmineUP. Jij vroeg om een opdracht om dit in reporter_dashboards toe te voegen; de sessie las dat als keuze (a). Klopt dat?
+  Jan chose: "Ja, in reporter_dashboards" (Deze plugin blijft zoals hij is; reporter_dashboards biedt de to-do's zelf aan, met de rechten van wie het rapport bekijkt.). Carry this out.
+  Jan's note: "ja in reporter dashboards maar in de nieuwe branch (laatste versie) niet die van main"
