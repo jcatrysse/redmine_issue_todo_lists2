@@ -23,7 +23,7 @@ what is left. Written 2026-10-06 from a measured analysis (report at the bottom)
 | After sync | n.v.t. |
 | Complexity (1 trivial .. 5 rewrite) | 1 |
 | Measured on | Redmine 7.0.1 (7.0-stable-GEOxyz @ `8067e23`), Rails 8.1.3.1, Ruby 3.3.6, PostgreSQL 16.15 and MariaDB 10.11.14 |
-| Migration session | 2026-10-06, done: no plugin code change needed; tests, e2e and review below |
+| Migration session | 2026-10-06 done; 2026-10-07 Jan's decisions built: `IssueQuery`/`QueriesHelper` patches now use `prepend` (`b53e891`) |
 
 ## Already on this branch
 
@@ -32,7 +32,10 @@ what is left. Written 2026-10-06 from a measured analysis (report at the bottom)
   `docs/e2e/mariadb-semijoin-on/` the evidence of the MariaDB optimizer bug (see "After the upgrade").
 - `.codex/start_server.sh`: grants the e2e database to the MariaDB account `test_setup.sh` creates
   (it was refused with "Access denied for 'redmine'@'127.0.0.1'").
-- No change to the plugin's own code (`app/`, `lib/`, `config/`, `db/`, `assets/`, `init.rb`).
+- `b53e891`: `IssueQuery` and `QueriesHelper#column_content` patched with `prepend` instead of `alias_method`
+  (Jan, 2026-10-07), with `spec/patches_spec.rb`. The only change to the plugin's own code.
+- `test/e2e/together.mjs`: Project > Settings, issue list and issue page as every user;
+  `docs/e2e/all-plugins/`: the e2e set with all GEOxyz plugins installed.
 
 ## Work list for the migration session
 
@@ -67,6 +70,17 @@ In this order: things that break, security, the GEOxyz changes, the open items, 
    webhook event for plugin objects.
 5. Verify every feature of the plugin by hand on a running Redmine 7 (screenshots).
    **DONE**: inventory below, every screenshot looked at.
+
+**Decided by Jan 2026-10-07**
+
+11. Core methods that other plugins also patch: `prepend`, never `alias_method`. **DONE in `b53e891`.**
+    `IssueQuery#initialize_available_filters`, `#available_columns`, `#joins_for_order_statement` and
+    `QueriesHelper#column_content` are now prepended modules (`RedmineIssueTodoLists::Patches::IssueQueryPatch`,
+    `QueriesHelperPatch`); same bodies, `super` instead of the `_without_itdl` aliases. Test:
+    `spec/patches_spec.rb` prepends another plugin's module first and then applies this plugin's patches
+    (as at boot, plugins load alphabetically): 3 examples, 3 failures with `SystemStackError` before the
+    change, 0 failures after. Together with all GEOxyz plugins: see "Together" under Results.
+12. No 5.1, PostgreSQL only, MariaDB bug: recorded under "Decided by Jan" and in the Rules; no code.
 
 **Found while testing (pre-existing, not Redmine 7 related, not fixed: rule "do not fix in passing")**
 
@@ -114,6 +128,34 @@ on every script, shellcheck on `start_server.sh` shows only the existing SC1091 
 (`gpt-5`, `9e1550ed2d..315c1fe`): "No findings." (`docs/reviews/openai-2026-10-06-315c1fe.md`).
 Left for later: `webhooks.mjs` leaves the core setting "webhooks enabled" on in the e2e database.
 
+**After the prepend change (2026-10-07), Redmine 7.0-stable-GEOxyz @ `37d7181`, PostgreSQL 16.15**
+
+| | result |
+|---|---|
+| specs, plugin alone | 143 examples, 0 failures, 1 pending (also in random order, seed 31658) |
+| e2e alone, `start_server.sh --reset` + `e2e.sh` | 15 scripts, 103 screenshots, 0 problems (`docs/e2e/`) |
+| boot + eager load with the 39 other GEOxyz plugins (their `redmine70-migration` branches of 2026-10-07; drive, questions and resources have no such branch and are left out) | OK, 40 plugins; this plugin's modules sit in the prepend chains of `IssueQuery` and `QueriesHelper` |
+| specs with all 40 plugins | 143 examples, 49 failures: 15 `SystemStackError` from redmine_issue_field_visibility (below) |
+| specs with all but redmine_issue_field_visibility | 143 examples, 16 failures, 0 server errors; without redmine_view_issue_description as well: 6 failures |
+| e2e with all but redmine_issue_field_visibility (`docs/e2e/all-plugins/`) | 15 scripts, 99 screenshots; every function of this plugin works; 8 problems, all from other plugins (below) |
+
+**Together: what fails comes from other plugins, not from this one**
+- redmine_issue_field_visibility (`redmine70-migration` @ `0c661cd`) still patches
+  `IssueQuery#initialize_available_filters` and `#available_columns` with `alias_method`; with redmine_agile's
+  prepend that recurses: the issue list, the issue API and every issue query answer 500
+  (`docs/e2e/all-plugins/with-issue-field-visibility-issue-list-500.png`). Jan's prepend decision applies to that
+  plugin; it is not in this repository.
+- Project > Settings answers 500 with all plugins: `undefined method 'dcf_relevant_custom_fields'` in
+  redmine_depending_custom_fields' settings tab (`_settings_tab.html.erb:1`). This plugin does not touch
+  `ProjectsHelper` or the settings page.
+- redmine_view_issue_description refuses the issue page (and the issue JSON to anonymous) to roles without its own
+  permission (`vid_authorize_issue_detail`): 403 for reporter and viewer in the e2e, 10 spec failures, and
+  `remove_closed.mjs` stops because it reads the issue JSON anonymously. Behaviour of that plugin by design;
+  roles need its permission in production.
+- 6 context-menu specs assume this plugin's folder is the last entry and that no "Dates" entry exists; with
+  redmine_context_menu_actions (Dates) and redmineup_tags (Add tags) installed that is not so. The menu itself
+  works (`context_menu.mjs` green with all plugins). Specs left as they are (they hold for the plugin alone).
+
 ## Inventory of functions
 
 Scenario scripts in `test/e2e/`, screenshots in `docs/e2e/<scenario>-*.png` with a caption table in
@@ -138,6 +180,7 @@ reporter (no plugin permission), outsider (no membership), anonymous.
 | Plugin settings (sidebar, issue form) | Administration > Plugins > Configure | `settings.mjs` | page, off, issue-off, edit-off, edit-on, manager-refused (403) |
 | User deletion hands lists to Anonymous | Administration > Users > Delete | `user_delete.mjs` | created-by-leaver, confirm-delete, deleted, list-after |
 | Webhooks (Redmine 7) | My account > Webhooks | `webhooks.mjs` | new-webhook, payloads, webhook-deleted; `webhooks-payloads.json` |
+| Pages other plugins also patch: Project > Settings, issue list with filter/columns/sort, issue page | project menu, issue list | `together.mjs` | admin/manager-project-settings, -issue-list, -issue; reporter-project-settings-refused (403), reporter-issue-list (no columns), reporter-issue; outsider-private-refused (403), outsider-issue-list |
 | Every plugin page renders (smoke), core issue flows | | `.codex/e2e/smoke.mjs`, `core.mjs` | smoke-01..16, core-* |
 | Liquid drop `todolists_with_positions` | report templates via redmineup | runner check (item 2) | none: no template engine with this drop on 7.0 without redmineup |
 | Migrations (10), rollback | rake | `redmine:plugins:migrate VERSION=0` and up | PostgreSQL and MariaDB OK |
