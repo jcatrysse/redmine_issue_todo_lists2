@@ -64,8 +64,11 @@ RSpec.describe 'issue list with the to-do list columns' do
     titles = row.css('td.issue_todo_list_titles-titles a')
     expect(titles.map(&:text)).to eq(%w[Elsewhere Sprint])
     expect(titles.map { |a| a['href'] }.first).to eq("/projects/private-child/issue_todo_lists/#{IssueTodoList.find_by(:title => 'Elsewhere').id}")
+    # Positions on the two lists jsmith may see, in title order; not on Hidden.
     issue = Issue.find_by(:subject => 'Listed issue 0')
-    expect(row.at_css('td.issue_todo_list_item_orders-positions').text.strip)
-      .to eq(issue.issue_todo_list_item_orders.positions(User.find(2)))
+    positions = %w[Elsewhere Sprint].map do |title|
+      IssueTodoListItem.find_by(:issue => issue, :issue_todo_list => IssueTodoList.find_by(:title => title)).position
+    end
+    expect(row.at_css('td.issue_todo_list_item_orders-positions').text.strip).to eq(positions.join(', '))
   end
 end
