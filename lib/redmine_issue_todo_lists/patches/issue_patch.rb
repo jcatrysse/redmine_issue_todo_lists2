@@ -43,12 +43,20 @@ module RedmineIssueTodoLists
           end
         end
 
+        # The items with their lists and projects, set by IssueQuery#issues for
+        # the whole page when a to-do list column is shown.
+        attr_writer :itdl_preloaded_items
+
         # Both columns use the same order, so titles and positions line up.
         def issue_todo_list_titles
+          return IssueTodoListTitles.new(@itdl_preloaded_items.map(&:issue_todo_list)) if @itdl_preloaded_items
+
           IssueTodoListTitles.new(issue_todo_lists.reorder("#{IssueTodoList.table_name}.title", "#{IssueTodoList.table_name}.id"))
         end
 
         def issue_todo_list_item_orders
+          return IssueTodoListItemOrders.new(@itdl_preloaded_items) if @itdl_preloaded_items
+
           IssueTodoListItemOrders.new(
             issue_todo_list_items.joins(:issue_todo_list).includes(:issue_todo_list)
                                  .reorder("#{IssueTodoList.table_name}.title", "#{IssueTodoList.table_name}.id")

@@ -56,6 +56,16 @@ module RedmineIssueTodoLists
         end
       end
 
+      # Loads the items of the page's issues, with their lists and projects,
+      # in one go when a to-do list column is shown, instead of once per row.
+      def issues(options = {})
+        issues = super
+        if (columns.map(&:name) & [:'issue_todo_list_titles.titles', :'issue_todo_list_item_orders.positions']).any?
+          itdl_preload_items(issues)
+        end
+        issues
+      end
+
       # One row per issue, so sorting does not duplicate issues.
       def joins_for_order_statement(order_options)
         joins = [super]
@@ -77,6 +87,16 @@ module RedmineIssueTodoLists
       end
 
       private
+
+      def itdl_preload_items(issues)
+        return if issues.empty?
+
+        items = IssueTodoListItem.where(:issue_id => issues.map(&:id)).joins(:issue_todo_list)
+                                 .preload(:issue_todo_list => :project)
+                                 .order("#{IssueTodoList.table_name}.title", "#{IssueTodoList.table_name}.id")
+                                 .group_by(&:issue_id)
+        issues.each { |issue| issue.itdl_preloaded_items = items[issue.id] || [] }
+      end
 
       # Lists the current user may view in the projects this query covers,
       # offered as filter values.
