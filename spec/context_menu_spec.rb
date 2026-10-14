@@ -7,10 +7,22 @@ require_relative 'spec_helper'
 # a "Dates" entry with a hidden modal and a script; that moved to
 # redmine_context_menu_actions in 2.3.0.
 #
-# The request specs read the whole menu, so they assume no other plugin that
-# adds to the context menu is installed in the test checkout. The partial specs
-# at the end check this plugin's output alone.
+# The request specs read the whole menu. Other GEOxyz plugins add entries
+# through the same hooks (redmine_context_menu_actions its own Dates entry,
+# redmineup_tags "Add tags", ...), so these specs render the menu with this
+# plugin's listener only. The menu with all plugins installed is checked in the
+# browser (test/e2e/context_menu.mjs). The partial specs at the end check this
+# plugin's output alone.
 RSpec.describe 'issues context menu' do
+  before do
+    allow(Redmine::Hook).to receive(:hook_listeners).and_wrap_original do |original, hook|
+      listeners = original.call(hook)
+      next listeners unless %i[view_issues_context_menu_start view_issues_context_menu_end].include?(hook)
+
+      listeners.grep(RedmineIssueTodoLists::Hooks::ViewIssuesContextMenuEndHook)
+    end
+  end
+
   let(:session) { new_session }
   let(:project) { Project.find(1) }
   let(:issue1)  { Issue.find(1) }
