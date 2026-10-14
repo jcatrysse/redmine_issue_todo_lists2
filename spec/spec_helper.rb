@@ -83,6 +83,11 @@ RSpec.configure do |config|
     User.current = User.find(1) # admin
     I18n.locale = :en
     Setting.clear_cache
+    # GEOxyz runs redmine_view_issue_description, which refuses the issue page
+    # to roles without its own permission; the roles in production have it.
+    if Redmine::Plugin.installed?(:redmine_view_issue_description)
+      Role.find_each { |role| role.add_permission!(:view_issue_description) }
+    end
   end
 
   config.after(:each) do
