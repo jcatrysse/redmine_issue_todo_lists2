@@ -31,7 +31,8 @@ fi
 if [ ! -d "$REDMINE_DIR/.git" ]; then
   git clone --depth 1 --branch "$REDMINE_VERSION" "$REDMINE_REPO" "$REDMINE_DIR"
 else
-  git -C "$REDMINE_DIR" fetch --depth 1 origin "$REDMINE_VERSION:refs/remotes/origin/$REDMINE_VERSION"
+  # "+": the GEOxyz branch is rebased upstream from time to time; follow it.
+  git -C "$REDMINE_DIR" fetch --depth 1 origin "+$REDMINE_VERSION:refs/remotes/origin/$REDMINE_VERSION"
   git -C "$REDMINE_DIR" checkout -B "$REDMINE_VERSION" "origin/$REDMINE_VERSION"
 fi
 
