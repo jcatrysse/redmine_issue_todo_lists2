@@ -79,10 +79,18 @@ if [ "$adapter" = mysql2 ] && command -v mysql >/dev/null 2>&1; then
     mysql --force -h "$host" -P "$port" -uroot -p"$password" -e "$grant FLUSH PRIVILEGES;" 2>/dev/null || true
 fi
 
-if [ ! -f "$REDMINE_DIR/config/configuration.yml" ]; then
+# Only for the server environment: under "default:" Redmine applies it to the
+# test environment as well, and specs that read ActionMailer deliveries then
+# find none. A file this script wrote under "default:" before is rewritten.
+conf="$REDMINE_DIR/config/configuration.yml"
+if [ -f "$conf" ] && [ "$(head -n 1 "$conf")" = "default:" ] && grep -q "location: $REDMINE_DIR/tmp/mails\$" "$conf" &&
+   [ "$(wc -l < "$conf")" -eq 5 ]; then
+  rm -f "$conf"
+fi
+if [ ! -f "$conf" ]; then
   mkdir -p "$REDMINE_DIR/tmp/mails"
-  cat > "$REDMINE_DIR/config/configuration.yml" <<YAML
-default:
+  cat > "$conf" <<YAML
+$RMP_SERVER_ENV:
   email_delivery:
     delivery_method: :file
     file_settings:
