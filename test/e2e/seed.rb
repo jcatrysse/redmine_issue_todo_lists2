@@ -45,3 +45,11 @@ if private_list.issue_todo_list_items.none?
 end
 
 puts "Plugin seed: #{IssueTodoList.count} lists, #{IssueTodoListItem.count} items, user viewer"
+
+# GEOxyz runs redmine_view_issue_description, which refuses the issue page to
+# roles without its own permission; the roles in production have it. The
+# scenarios also read the issue JSON anonymously, so every role gets it here.
+if Redmine::Plugin.installed?(:redmine_view_issue_description)
+  Role.find_each { |r| r.add_permission!(:view_issue_description) unless r.has_permission?(:view_issue_description) }
+  puts 'Plugin seed: view_issue_description granted to every role'
+end
