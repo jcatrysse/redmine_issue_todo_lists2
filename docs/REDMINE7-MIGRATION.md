@@ -147,6 +147,13 @@ with a `redmine70-migration` branch on 2026-10-14):
 | 2. 6 context menu specs fail: other plugins add entries through the same hooks (redmine_context_menu_actions "Dates", redmineup_tags "Add tags", ...) | `623d671`: the request specs render the menu with this plugin's listener only; assertions unchanged; the combined menu is checked by `context_menu.mjs` with all plugins | | 143 examples, 0 failures, 1 pending (alone and with all 40) |
 | 3. Harness H6: `start_server.sh` wrote `email_delivery` under `default:`, so the test environment also delivered by `:file` | `5704db7`: written for `$RMP_SERVER_ENV`; an old file of the script is replaced | test env `:file` | test `:test`, production `:file` |
 
+**Performance, 2026-10-14** (coordinator, all 44 plugins, 20,000 issues): the To-do lists / To-do list order columns
+ran one query per row (`issue_todo_list_titles.rb:19`). Fixed in the commit "Issue list: load the to-do list columns
+once per page": `IssueQuery#issues` loads the items of the page's issues with lists and projects in one query when a
+column is shown. Queries on this plugin's tables, issue list and CSV export: 25 rows 51 -> 3, 50 rows 101 -> 3
+(`spec/query_performance_spec.rb`). Specs 146 examples, 0 failures, 1 pending, alone and with all 40 plugins;
+`issue_query.mjs`, `together.mjs`, `csv_api.mjs` green, screenshots unchanged.
+
 e2e with all 40 plugins on `1d8c2a3` (`docs/e2e/all-plugins/`): 15 scripts, 103 screenshots, 0 problems.
 Project > Settings answers 200 (redmine_depending_custom_fields is fixed on its branch), the context menu shows
 redmine_context_menu_actions' Dates, this plugin's folder and the other plugins' entries together.
