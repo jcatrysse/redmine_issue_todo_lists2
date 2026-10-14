@@ -1,6 +1,6 @@
 # core
 
-Run 2026-10-07T16:26:48.350Z against http://127.0.0.1:3003.
+Run 2026-10-14T18:01:22.809Z against http://127.0.0.1:3003.
 
 | screenshot | user | URL | shows |
 |---|---|---|---|
@@ -10,7 +10,3 @@ Run 2026-10-07T16:26:48.350Z against http://127.0.0.1:3003.
 | ![](core-context-menu.png) | manager | `/projects/e2e-project/issues` | The context menu on the issue list |
 | ![](core-issue-as-reporter.png) | reporter | `/issues/1` | An issue seen by a member without the plugin's permissions |
 | ![](core-private-refused.png) | outsider | `/projects/e2e-private` | A private project is refused to a non-member |
-
-## Problems
-
-- /issues/1 as reporter: HTTP 403, expected 200

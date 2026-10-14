@@ -1,6 +1,6 @@
 # issue_query
 
-Run 2026-10-07T16:34:13.906Z against http://127.0.0.1:3003.
+Run 2026-10-14T18:08:48.590Z against http://127.0.0.1:3003.
 
 | screenshot | user | URL | shows |
 |---|---|---|---|

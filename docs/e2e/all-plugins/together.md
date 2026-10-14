@@ -1,6 +1,6 @@
 # together
 
-Run 2026-10-07T16:47:05.787Z against http://127.0.0.1:3003.
+Run 2026-10-14T18:23:58.684Z against http://127.0.0.1:3003.
 
 | screenshot | user | URL | shows |
 |---|---|---|---|
@@ -15,9 +15,3 @@ Run 2026-10-07T16:47:05.787Z against http://127.0.0.1:3003.
 | ![](together-reporter-issue.png) | reporter | `/issues/1` | The issue page answers 200 without the to-do list block |
 | ![](together-outsider-private-refused.png) | outsider | `/projects/e2e-private/issues` | The private project's issue list is refused to a non-member (403) |
 | ![](together-outsider-issue-list.png) | outsider | `/projects/e2e-project/issues?set_filter=1&f[]=todo_lists_ids&op[todo_lists_ids]=*&f[]=status_id&op[status_id]=*&c[]=subject&c[]=issue_todo_list_titles.titles&c[]=issue_todo_list_item_orders.positions&sort=issue_todo_list_item_orders.positions` | The public project's issue list answers 200 for a non-member, without the plugin's columns |
-
-## Problems
-
-- /projects/e2e-project/settings as admin: HTTP 500, expected 200
-- /projects/e2e-project/settings as manager: HTTP 500, expected 200
-- /issues/1 as reporter: HTTP 403, expected 200

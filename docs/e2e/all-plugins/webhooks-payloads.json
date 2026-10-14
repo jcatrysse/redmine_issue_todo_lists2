@@ -2,7 +2,7 @@
   {
     "type": "issue.updated",
     "issue": {
-      "id": 10,
+      "id": 11,
       "status": "New",
       "keys": [
         "id",
@@ -31,7 +31,7 @@
   {
     "type": "issue.closed",
     "issue": {
-      "id": 10,
+      "id": 11,
       "status": "Closed",
       "keys": [
         "id",
@@ -60,7 +60,7 @@
   {
     "type": "issue.updated",
     "issue": {
-      "id": 10,
+      "id": 11,
       "status": "Closed",
       "keys": [
         "id",

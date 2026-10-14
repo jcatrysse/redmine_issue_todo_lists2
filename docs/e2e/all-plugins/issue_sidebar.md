@@ -1,6 +1,6 @@
 # issue_sidebar
 
-Run 2026-10-07T16:35:45.852Z against http://127.0.0.1:3003.
+Run 2026-10-14T18:10:20.722Z against http://127.0.0.1:3003.
 
 | screenshot | user | URL | shows |
 |---|---|---|---|
@@ -10,9 +10,3 @@ Run 2026-10-07T16:35:45.852Z against http://127.0.0.1:3003.
 | ![](issue_sidebar-reporter.png) | reporter | `/issues/4` | A member without the plugin's permissions sees no to-do list block |
 | ![](issue_sidebar-removed.png) | manager | `/issues/4` | After confirming the remove, the issue page is shown again with the add button |
 | ![](issue_sidebar-closed-issue.png) | manager | `/issues/5` | A closed issue gets no add button for E2E cleanup, which removes closed issues |
-
-## Problems
-
-- /issues/4 as viewer: HTTP 403, expected 200
-- viewer: no listed mark
-- /issues/4 as reporter: HTTP 403, expected 200

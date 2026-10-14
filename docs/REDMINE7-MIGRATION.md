@@ -23,7 +23,7 @@ what is left. Written 2026-10-06 from a measured analysis (report at the bottom)
 | After sync | n.v.t. |
 | Complexity (1 trivial .. 5 rewrite) | 1 |
 | Measured on | Redmine 7.0.1 (7.0-stable-GEOxyz @ `8067e23`), Rails 8.1.3.1, Ruby 3.3.6, PostgreSQL 16.15 and MariaDB 10.11.14 |
-| Migration session | 2026-10-06 done; 2026-10-07 Jan's decisions built: `IssueQuery`/`QueriesHelper` patches now use `prepend` (`b53e891`) |
+| Migration session | 2026-10-06 done; 2026-10-07 decisions built (`prepend`, `b53e891`); 2026-10-14 combined-run findings fixed (`5704db7`, `0a523b9`, `623d671`) |
 
 ## Already on this branch
 
@@ -135,26 +135,21 @@ Left for later: `webhooks.mjs` leaves the core setting "webhooks enabled" on in 
 | specs, plugin alone | 143 examples, 0 failures, 1 pending (also in random order, seed 31658) |
 | e2e alone, `start_server.sh --reset` + `e2e.sh` | 15 scripts, 103 screenshots, 0 problems (`docs/e2e/`) |
 | boot + eager load with the 39 other GEOxyz plugins (their `redmine70-migration` branches of 2026-10-07; drive, questions and resources have no such branch and are left out) | OK, 40 plugins; this plugin's modules sit in the prepend chains of `IssueQuery` and `QueriesHelper` |
-| specs with all 40 plugins | 143 examples, 49 failures: 15 `SystemStackError` from redmine_issue_field_visibility (below) |
-| specs with all but redmine_issue_field_visibility | 143 examples, 16 failures, 0 server errors; without redmine_view_issue_description as well: 6 failures |
-| e2e with all but redmine_issue_field_visibility (`docs/e2e/all-plugins/`) | 15 scripts, 99 screenshots; every function of this plugin works; 8 problems, all from other plugins (below) |
+| specs with all 40 plugins (2026-10-07) | 143 examples, 49 failures: 15 `SystemStackError` from redmine_issue_field_visibility, then fixed on its branch |
 
-**Together: what fails comes from other plugins, not from this one**
-- redmine_issue_field_visibility (`redmine70-migration` @ `0c661cd`) still patches
-  `IssueQuery#initialize_available_filters` and `#available_columns` with `alias_method`; with redmine_agile's
-  prepend that recurses: the issue list, the issue API and every issue query answer 500
-  (`docs/e2e/all-plugins/with-issue-field-visibility-issue-list-500.png`). Jan's prepend decision applies to that
-  plugin; it is not in this repository.
-- Project > Settings answers 500 with all plugins: `undefined method 'dcf_relevant_custom_fields'` in
-  redmine_depending_custom_fields' settings tab (`_settings_tab.html.erb:1`). This plugin does not touch
-  `ProjectsHelper` or the settings page.
-- redmine_view_issue_description refuses the issue page (and the issue JSON to anonymous) to roles without its own
-  permission (`vid_authorize_issue_detail`): 403 for reporter and viewer in the e2e, 10 spec failures, and
-  `remove_closed.mjs` stops because it reads the issue JSON anonymously. Behaviour of that plugin by design;
-  roles need its permission in production.
-- 6 context-menu specs assume this plugin's folder is the last entry and that no "Dates" entry exists; with
-  redmine_context_menu_actions (Dates) and redmineup_tags (Add tags) installed that is not so. The menu itself
-  works (`context_menu.mjs` green with all plugins). Specs left as they are (they hold for the plugin alone).
+**Combined run 2026-10-14** (coordinator, Redmine 7.0-stable-GEOxyz @ `1d8c2a3`, 44 plugins, smoke 0 problems) found three
+things for this repository; all three are fixed. Re-measured here on `1d8c2a3` with 40 plugins (the 39 other plugins
+with a `redmine70-migration` branch on 2026-10-14):
+
+| finding | fix | before | after |
+|---|---|---|---|
+| 1. 10 issue page specs get 302/403: redmine_view_issue_description refuses roles without its own permission (by design) | `0a523b9`: the fixture roles get `view_issue_description` when that plugin is installed; same in `test/e2e/seed.rb` | 16 failures with all plugins | |
+| 2. 6 context menu specs fail: other plugins add entries through the same hooks (redmine_context_menu_actions "Dates", redmineup_tags "Add tags", ...) | `623d671`: the request specs render the menu with this plugin's listener only; assertions unchanged; the combined menu is checked by `context_menu.mjs` with all plugins | | 143 examples, 0 failures, 1 pending (alone and with all 40) |
+| 3. Harness H6: `start_server.sh` wrote `email_delivery` under `default:`, so the test environment also delivered by `:file` | `5704db7`: written for `$RMP_SERVER_ENV`; an old file of the script is replaced | test env `:file` | test `:test`, production `:file` |
+
+e2e with all 40 plugins on `1d8c2a3` (`docs/e2e/all-plugins/`): 15 scripts, 103 screenshots, 0 problems.
+Project > Settings answers 200 (redmine_depending_custom_fields is fixed on its branch), the context menu shows
+redmine_context_menu_actions' Dates, this plugin's folder and the other plugins' entries together.
 
 ## Inventory of functions
 
@@ -209,11 +204,11 @@ Recorded from `docs/DECISIONS-2026-10-07.md` (Jan's answers in the coordinating 
 1. **MariaDB optimizer bug** (was open question 2). No option chosen; Jan's note: "we gebruiken geen
    mariadb". GEOxyz does not run MariaDB, so nothing to do. The finding and its reproduction stay in
    "Results" and `docs/e2e/mariadb-semijoin-on/` as a note.
-2. **Liquid `todolists_with_positions` without redmineup** (was open question 1). Not in Jan's decision
-   list. On 2026-10-07 Jan asked in this session for a prompt to add the field to
-   redmine_reporter_dashboards, which is option (a): this plugin stays as is, reporter_dashboards adds it
-   in its own drop layer with `issue.todolists_with_positions(actor)`. Recorded as (a); the work belongs
-   to that repository.
+2. **Liquid `todolists_with_positions` without redmineup** (was open question 1). Round 2, 2026-10-07
+   (`docs/DECISIONS-2026-10-07.md`): Jan chose "Ja, in reporter_dashboards": this plugin stays as is,
+   reporter_dashboards offers the to-do lists itself, with the rights of whoever views the report.
+   Jan's note: "ja in reporter dashboards maar in de nieuwe branch (laatste versie) niet die van main".
+   Nothing to build in this repository.
 
 ## GEOxyz changes to review or re-apply
 
